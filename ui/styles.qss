@@ -1,0 +1,444 @@
+/* ═══════════════════════════════════════════════════════════════
+   Pickems — Qt Style Sheet
+   Dark theme inspired by GitHub Dark.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Global reset ──────────────────────────────────────────────── */
+QWidget {
+    background-color: #0d1117;
+    color: #e6edf3;
+    font-family: "Inter", "system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif;
+    font-size: 13px;
+    border: none;
+    outline: none;
+}
+
+QLabel {
+    background: transparent;
+}
+
+QMainWindow {
+    background: #0d1117;
+}
+
+QScrollArea {
+    background: transparent;
+    border: none;
+}
+
+QScrollArea > QWidget > QWidget {
+    background: transparent;
+}
+
+/* ── Scrollbars ────────────────────────────────────────────────── */
+QScrollBar:horizontal {
+    background: #0d1117;
+    height: 8px;
+    margin: 0;
+}
+QScrollBar::handle:horizontal {
+    background: #30363d;
+    border-radius: 4px;
+    min-width: 32px;
+}
+QScrollBar::handle:horizontal:hover { background: #484f58; }
+QScrollBar::add-line:horizontal,
+QScrollBar::sub-line:horizontal { width: 0; border: none; background: none; }
+
+QScrollBar:vertical {
+    background: #0d1117;
+    width: 8px;
+    margin: 0;
+}
+QScrollBar::handle:vertical {
+    background: #30363d;
+    border-radius: 4px;
+    min-height: 32px;
+}
+QScrollBar::handle:vertical:hover { background: #484f58; }
+QScrollBar::add-line:vertical,
+QScrollBar::sub-line:vertical { height: 0; border: none; background: none; }
+
+/* ── Sidebar ───────────────────────────────────────────────────── */
+QWidget#sidebar {
+    background: #010409;
+    border-right: 1px solid #21262d;
+    min-width: 210px;
+    max-width: 210px;
+}
+
+QLabel#sidebar-logo {
+    font-size: 15px;
+    font-weight: 700;
+    color: #e6edf3;
+    letter-spacing: 0.5px;
+}
+
+QPushButton#sidebar-game-header {
+    background: transparent;
+    border: none;
+    min-height: 44px;
+    max-height: 44px;
+    margin: 4px 8px;
+    border-radius: 6px;
+}
+QPushButton#sidebar-game-header:hover {
+    background: #161b22;
+}
+
+QLabel#sidebar-game-icon {
+    font-size: 18px;
+    color: #8b949e;
+    background: transparent;
+}
+QLabel#sidebar-game-name {
+    font-size: 11px;
+    font-weight: 700;
+    color: #e6edf3;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    background: transparent;
+}
+QLabel#sidebar-game-chevron {
+    font-size: 11px;
+    color: #484f58;
+    background: transparent;
+}
+
+QPushButton#sidebar-tournament-btn {
+    background: transparent;
+    color: #8b949e;
+    font-size: 12px;
+    font-weight: 400;
+    text-align: left;
+    padding: 6px 8px 6px 32px; /* Indent under game header */
+    border: none;
+    border-radius: 6px;
+    margin: 1px 8px;
+}
+QPushButton#sidebar-tournament-btn:hover {
+    color: #e6edf3;
+    background: #161b22;
+}
+QPushButton#sidebar-tournament-btn[active="true"] {
+    color: #e6edf3;
+    background: #1c2333;
+    font-weight: 500;
+}
+
+QFrame#header {
+    background: #0d1117;
+    border-bottom: 1px solid #21262d;
+    min-height: 56px;
+    max-height: 56px;
+}
+
+QPushButton#toggle-sidebar-btn {
+    background: transparent;
+    color: #8b949e;
+    font-size: 16px;
+    border: none;
+    padding: 6px;
+    border-radius: 4px;
+}
+QPushButton#toggle-sidebar-btn:hover {
+    color: #e6edf3;
+    background: #161b22;
+}
+
+QLabel#tournament-name-label {
+    font-size: 15px;
+    font-weight: 700;
+    color: #e6edf3;
+    letter-spacing: 0.2px;
+}
+
+QLabel#accuracy-label {
+    font-size: 12px;
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 6px;
+    padding: 6px 12px;
+}
+
+/* ── Stage Tab Bar ─────────────────────────────────────────────── */
+QFrame#stage-tab-bar {
+    background: #0d1117;
+    border-bottom: 1px solid #21262d;
+    min-height: 44px;
+    max-height: 44px;
+}
+
+QPushButton#stage-tab {
+    background: transparent;
+    color: #8b949e;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 12px 18px;
+    border: none;
+    border-bottom: 2px solid transparent;
+    border-radius: 0;
+}
+QPushButton#stage-tab:hover { color: #e6edf3; }
+QPushButton#stage-tab[active="true"] {
+    color: #e6edf3;
+    border-bottom: 2px solid #1f6feb;
+}
+
+/* ── Round Column ──────────────────────────────────────────────── */
+QWidget#round-column {
+    background: transparent;
+    min-width: 140px;
+    max-width: 280px;
+}
+
+QWidget#round-header {
+    background: #161b22;
+    border: 1px solid #21262d;
+    border-radius: 6px;
+}
+
+QLabel#round-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: #e6edf3;
+    background: transparent;
+}
+
+QLabel#round-subtitle {
+    font-size: 10px;
+    color: #8b949e;
+    background: transparent;
+}
+
+QLabel#wl-group-label {
+    font-size: 12px;
+    color: #8b949e;
+    font-weight: 700;
+    background: transparent;
+    letter-spacing: 0.5px;
+    padding: 8px 2px 2px 2px;
+}
+
+QLabel#bo3-badge {
+    background: #271f00;
+    color: #e3b341;
+    font-size: 8px;
+    font-weight: 800;
+    border-radius: 3px;
+    padding: 1px 5px;
+    border: 1px solid #3d2e00;
+    letter-spacing: 0.5px;
+}
+
+/* ── Team Card ─────────────────────────────────────────────────── */
+QWidget#team-card {
+    background: #161b22;
+    border: 1px solid #21262d;
+    min-height: 36px;
+    max-height: 36px;
+}
+QWidget#team-card[position="top"] {
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom: none;
+}
+QWidget#team-card[position="bottom"] {
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+QWidget#team-card:hover {
+    background: #1c2333;
+    border-color: #30363d;
+}
+/* Picked (no result yet) */
+QWidget#team-card[state="picked"] {
+    background: #0d2a18;
+    border-left: 3px solid #3fb950;
+    border-color: #1a4a2e;
+}
+QWidget#team-card[position="top"][state="picked"] {
+    border-top-left-radius: 5px; border-top-right-radius: 5px;
+    border-bottom: none;
+}
+QWidget#team-card[position="bottom"][state="picked"] {
+    border-bottom-left-radius: 5px; border-bottom-right-radius: 5px;
+    border-top: 1px solid #1a4a2e;
+}
+/* Unpicked in pairing (no result yet) */
+QWidget#team-card[state="unpicked"] {
+    background: #161b22;
+    border: 1px solid #21262d;
+}
+/* Correct prediction */
+QWidget#team-card[state="correct"] {
+    background: #0d2a18;
+    border-left: 3px solid #3fb950;
+    border-color: #1a4a2e;
+}
+QWidget#team-card[position="top"][state="correct"] {
+    border-top-left-radius: 5px; border-top-right-radius: 5px;
+    border-bottom: none;
+}
+QWidget#team-card[position="bottom"][state="correct"] {
+    border-bottom-left-radius: 5px; border-bottom-right-radius: 5px;
+    border-top: 1px solid #1a4a2e;
+}
+/* Wrong prediction */
+QWidget#team-card[state="wrong"] {
+    background: #2d0f12;
+    border-left: 3px solid #f85149;
+    border-color: #4a1a1e;
+}
+QWidget#team-card[position="top"][state="wrong"] {
+    border-top-left-radius: 5px; border-top-right-radius: 5px;
+    border-bottom: none;
+}
+QWidget#team-card[position="bottom"][state="wrong"] {
+    border-bottom-left-radius: 5px; border-bottom-right-radius: 5px;
+    border-top: 1px solid #4a1a1e;
+}
+/* Actual winner (not picked) */
+QWidget#team-card[state="winner"] {
+    background: #0d2a18;
+    border-left: 3px solid #3fb950;
+    border-color: #1a4a2e;
+}
+QWidget#team-card[position="top"][state="winner"] {
+    border-top-left-radius: 5px; border-top-right-radius: 5px;
+    border-bottom: none;
+}
+QWidget#team-card[position="bottom"][state="winner"] {
+    border-bottom-left-radius: 5px; border-bottom-right-radius: 5px;
+    border-top: 1px solid #1a4a2e;
+}
+/* Loser (actual result known, this team lost) */
+QWidget#team-card[state="loser"] {
+    background: #0d1117;
+    border-color: #21262d;
+}
+/* Advanced from stage */
+QWidget#team-card[state="advanced"] {
+    background: #0a1c30;
+    border-color: #1c3250;
+}
+/* Eliminated from stage */
+QWidget#team-card[state="eliminated"] {
+    background: #180d0d;
+    border-color: #2d1515;
+}
+
+/* Team card label styling */
+QLabel#seed-label {
+    color: #484f58;
+    font-size: 10px;
+    font-weight: 600;
+    background: transparent;
+    min-width: 26px;
+}
+QLabel#team-name-label {
+    color: #e6edf3;
+    font-size: 12px;
+    font-weight: 500;
+    background: transparent;
+}
+QLabel#team-record-label {
+    color: #484f58;
+    font-size: 10px;
+    background: transparent;
+}
+QLabel#initials-label {
+    color: #8b949e;
+    font-size: 8px;
+    font-weight: 700;
+    background: #2d333b;
+    border-radius: 3px;
+}
+/* Override text colors for specific states */
+QWidget#team-card[state="picked"] QLabel#team-name-label { color: #3fb950; }
+QWidget#team-card[state="unpicked"] QLabel#team-name-label { color: #f85149; }
+QWidget#team-card[state="correct"] QLabel#team-name-label { color: #3fb950; }
+QWidget#team-card[state="wrong"] QLabel#team-name-label { color: #f85149; }
+QWidget#team-card[state="winner"] QLabel#team-name-label { color: #3fb950; }
+QWidget#team-card[state="loser"] QLabel#team-name-label { color: #484f58; }
+QWidget#team-card[state="loser"] QLabel#seed-label { color: #30363d; }
+QWidget#team-card[state="eliminated"] QLabel#team-name-label { color: #4a2020; }
+QWidget#team-card[state="eliminated"] QLabel#seed-label { color: #30363d; }
+
+/* ── Final Result Column ───────────────────────────────────────── */
+QWidget#final-column {
+    min-width: 140px;
+    max-width: 280px;
+    background: transparent;
+}
+
+QLabel#final-header {
+    font-size: 12px;
+    font-weight: 700;
+    color: #e6edf3;
+    background: #161b22;
+    border: 1px solid #21262d;
+    border-radius: 6px;
+    padding: 6px 10px;
+}
+
+QLabel#final-group-label {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.3px;
+}
+QLabel#final-group-label[group="advanced"] {
+    color: #3fb950;
+    background: #0d2518;
+}
+QLabel#final-group-label[group="eliminated"] {
+    color: #f85149;
+    background: #2d0f0f;
+}
+
+QWidget#final-team-row {
+    background: #161b22;
+    border: 1px solid #21262d;
+    border-radius: 4px;
+    min-height: 28px;
+    max-height: 28px;
+}
+QLabel#final-seed { color: #484f58; font-size: 10px; font-weight: 600; background: transparent; }
+QLabel#final-name { color: #e6edf3; font-size: 12px; font-weight: 500; background: transparent; }
+
+/* ── Bracket View ──────────────────────────────────────────────── */
+QLabel#bracket-round-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: #58a6ff;
+    background: transparent;
+    padding: 8px 4px 4px 4px;
+}
+
+QLabel#bracket-half-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: #484f58;
+    background: transparent;
+    letter-spacing: 0.5px;
+    padding: 2px 4px;
+}
+
+/* ── Tooltips ──────────────────────────────────────────────────── */
+QToolTip {
+    background: #2d333b;
+    color: #e6edf3;
+    border: 1px solid #444c56;
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+/* ── Misc ──────────────────────────────────────────────────────── */
+QFrame#separator {
+    background: #21262d;
+    max-height: 1px;
+    min-height: 1px;
+}

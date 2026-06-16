@@ -1,0 +1,50 @@
+{
+  "playin_m3": {
+    "picked": "t1",
+    "locked": false
+  },
+  "playin_m5": {
+    "picked": "liquid",
+    "locked": false
+  },
+  "main_event_m8": {
+    "picked": "playin_winner",
+    "locked": false
+  },
+  "main_event_m9": {
+    "picked": "furia",
+    "locked": false
+  },
+  "main_event_m5": {
+    "picked": "hle",
+    "locked": false
+  },
+  "main_event_m6": {
+    "picked": "blg",
+    "locked": false
+  },
+  "main_event_m10": {
+    "picked": "g2",
+    "locked": false
+  },
+  "main_event_m11": {
+    "picked": "tes",
+    "locked": false
+  },
+  "main_event_m12": {
+    "picked": "g2",
+    "locked": false
+  },
+  "main_event_m7": {
+    "picked": "hle",
+    "locked": false
+  },
+  "main_event_m13": {
+    "picked": "blg",
+    "locked": false
+  },
+  "main_event_m14": {
+    "picked": "hle",
+    "locked": false
+  }
+}
