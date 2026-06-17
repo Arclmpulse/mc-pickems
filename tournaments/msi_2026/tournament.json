@@ -9,10 +9,26 @@
       "type": "double_elim",
       "match_type": "bo3",
       "teams": [
-        { "id": "t1", "name": "T1", "seed": 1 },
-        { "id": "liquid", "name": "Team Liquid", "seed": 2 },
-        { "id": "kc", "name": "Karmine Corp", "seed": 3 },
-        { "id": "dcg", "name": "DCG", "seed": 4 }
+        {
+          "id": "t1",
+          "name": "T1",
+          "seed": 1
+        },
+        {
+          "id": "kc",
+          "name": "Karmine Corp",
+          "seed": 2
+        },
+        {
+          "id": "dcg",
+          "name": "DCG",
+          "seed": 3
+        },
+        {
+          "id": "liquid",
+          "name": "Team Liquid",
+          "seed": 4
+        }
       ]
     },
     {
@@ -21,14 +37,46 @@
       "type": "double_elim",
       "match_type": "bo5",
       "teams": [
-        { "id": "hle", "name": "Hanwha Life Esports", "seed": 1 },
-        { "id": "blg", "name": "Bilibili Gaming", "seed": 2 },
-        { "id": "g2", "name": "G2 Esports", "seed": 3 },
-        { "id": "tes", "name": "Top Esports", "seed": 4 },
-        { "id": "lyon", "name": "LYON", "seed": 5 },
-        { "id": "tsw", "name": "TSW", "seed": 6 },
-        { "id": "furia", "name": "FURIA", "seed": 7 },
-        { "id": "playin_winner", "name": "Play-in Winner", "seed": 8 }
+        {
+          "id": "blg",
+          "name": "Bilibili Gaming",
+          "seed": 1
+        },
+        {
+          "id": "g2",
+          "name": "G2 Esports",
+          "seed": 2
+        },
+        {
+          "id": "hle",
+          "name": "Hanwha Life Esports",
+          "seed": 3
+        },
+        {
+          "id": "lyon",
+          "name": "LYON Gaming",
+          "seed": 4
+        },
+        {
+          "id": "tsw",
+          "name": "Team Secret Whales",
+          "seed": 5
+        },
+        {
+          "id": "furia",
+          "name": "FURIA",
+          "seed": 6
+        },
+        {
+          "id": "tes",
+          "name": "Top Esports",
+          "seed": 7
+        },
+        {
+          "id": "playin_winner",
+          "name": "Play-in Winner",
+          "seed": 8
+        }
       ]
     }
   ]

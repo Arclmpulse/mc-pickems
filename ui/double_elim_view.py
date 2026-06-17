@@ -15,7 +15,7 @@ from PyQt6.QtWidgets import (
 from data.manager import TournamentManager
 from engine.double_elim import DoubleElimState, DoubleElimMatch
 from ui.match_card import MatchCard
-from ui.utils import set_prop
+from ui.utils import set_prop, find_local_logo
 
 
 class _DoubleElimColumn(QWidget):
@@ -106,7 +106,7 @@ class DoubleElimView(QScrollArea):
 
         # Compute dynamic top spacer for Grand Final column to align its round title with the others
         temp_lbl = QLabel("Upper Bracket")
-        temp_lbl.setStyleSheet("color: #58a6ff; font-weight: bold; font-size: 13px;")
+        temp_lbl.setStyleSheet("color: #3fb950; font-weight: bold; font-size: 13px;")
         header_h = temp_lbl.sizeHint().height()
         temp_lbl.deleteLater()
         gf_top_spacer = header_h + 20  # header height + left_side_layout spacing (20px)
@@ -133,7 +133,7 @@ class DoubleElimView(QScrollArea):
         self._content_layout.addWidget(divider)
 
         # Grand Final Match Column on the right
-        gf_col = _DoubleElimColumn("Grand Final", top_spacer_height=gf_top_spacer)
+        gf_col = _DoubleElimColumn("Grand Finals", top_spacer_height=gf_top_spacer)
         gf_match_id = f"{self.stage_id}_m6" if len(state.teams) == 4 else f"{self.stage_id}_m14"
         
         # Find match by ID
@@ -148,7 +148,7 @@ class DoubleElimView(QScrollArea):
     def _build_4team_layout(self, parent_layout: QVBoxLayout, state: DoubleElimState, logo_cache: Dict[str, Optional[str]]) -> None:
         # GSL Play-in Upper Bracket
         upper_header = QLabel("Winners Bracket")
-        upper_header.setStyleSheet("color: #58a6ff; font-weight: bold; font-size: 13px;")
+        upper_header.setStyleSheet("color: #3fb950; font-weight: bold; font-size: 13px;")
         parent_layout.addWidget(upper_header)
 
         upper_row = QWidget()
@@ -203,7 +203,7 @@ class DoubleElimView(QScrollArea):
     def _build_8team_layout(self, parent_layout: QVBoxLayout, state: DoubleElimState, logo_cache: Dict[str, Optional[str]]) -> None:
         # Upper Bracket Section
         upper_header = QLabel("Upper Bracket")
-        upper_header.setStyleSheet("color: #58a6ff; font-weight: bold; font-size: 13px;")
+        upper_header.setStyleSheet("color: #3fb950; font-weight: bold; font-size: 13px;")
         parent_layout.addWidget(upper_header)
 
         upper_row = QWidget()
@@ -294,13 +294,7 @@ class DoubleElimView(QScrollArea):
     def _build_logo_cache(self, state: DoubleElimState) -> Dict[str, Optional[str]]:
         cache: Dict[str, Optional[str]] = {}
         for team_id in state.teams:
-            for ext in (".svg", ".png", ".webp", ".jpg"):
-                p = self.cache_dir / f"{team_id}{ext}"
-                if p.exists():
-                    cache[team_id] = str(p)
-                    break
-            else:
-                cache[team_id] = None
+            cache[team_id] = find_local_logo(self.cache_dir, team_id)
         return cache
 
     def _make_card(

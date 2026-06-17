@@ -37,6 +37,9 @@ class ElidedLabel(QLabel):
         painter.end()
 
 
+_logo_cache = {}
+
+
 def load_logo(logo_path: Optional[str], size: int = 20) -> Optional[QPixmap]:
     """
     Load a team logo from a local path (SVG or raster).
@@ -44,8 +47,13 @@ def load_logo(logo_path: Optional[str], size: int = 20) -> Optional[QPixmap]:
     """
     if not logo_path:
         return None
+    cache_key = (logo_path, size)
+    if cache_key in _logo_cache:
+        return _logo_cache[cache_key]
+
     p = Path(logo_path)
     if not p.exists():
+        _logo_cache[cache_key] = None
         return None
 
     try:
@@ -61,28 +69,36 @@ def load_logo(logo_path: Optional[str], size: int = 20) -> Optional[QPixmap]:
                     painter = QPainter(pm)
                     renderer.render(painter)
                     painter.end()
+                    _logo_cache[cache_key] = pm
                     return pm
             except ImportError:
                 pass
             # Fall back to direct QPixmap load (works if Qt has SVG plugin)
             pm = QPixmap(str(p))
             if not pm.isNull():
-                return pm.scaled(
+                res = pm.scaled(
                     size, size,
                     Qt.AspectRatioMode.KeepAspectRatio,
                     Qt.TransformationMode.SmoothTransformation,
                 )
+                _logo_cache[cache_key] = res
+                return res
+            _logo_cache[cache_key] = None
             return None
         else:
             pm = QPixmap(str(p))
             if pm.isNull():
+                _logo_cache[cache_key] = None
                 return None
-            return pm.scaled(
+            res = pm.scaled(
                 size, size,
                 Qt.AspectRatioMode.KeepAspectRatio,
                 Qt.TransformationMode.SmoothTransformation,
             )
+            _logo_cache[cache_key] = res
+            return res
     except Exception:
+        _logo_cache[cache_key] = None
         return None
 
 
@@ -97,4 +113,22 @@ def load_game_icon(game_id: str, tournaments_dir: Path, size: int = 20) -> Optio
         p = tournaments_dir / f"{game_id}{ext}"
         if p.exists():
             return load_logo(str(p), size)
+    return None
+
+
+_logo_path_cache = {}
+
+
+def find_local_logo(cache_dir: Path, team_id: str) -> Optional[str]:
+    """Check the cache dir for a logo file with local caching."""
+    cache_key = (str(cache_dir), team_id)
+    if cache_key in _logo_path_cache:
+        return _logo_path_cache[cache_key]
+    for ext in (".svg", ".png", ".webp", ".jpg"):
+        p = cache_dir / f"{team_id}{ext}"
+        if p.exists():
+            res = str(p)
+            _logo_path_cache[cache_key] = res
+            return res
+    _logo_path_cache[cache_key] = None
     return None

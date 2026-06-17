@@ -16,7 +16,7 @@ from PyQt6.QtWidgets import (
 from data.manager import TournamentManager
 from engine.bracket import BracketState, BracketMatch
 from ui.match_card import MatchCard
-from ui.utils import set_prop
+from ui.utils import set_prop, find_local_logo
 
 
 class _BracketColumn(QWidget):
@@ -130,10 +130,10 @@ class BracketView(QScrollArea):
 
         # ── SF column ──────────────────────────────────────────────────────
         sf_col = _BracketColumn("Semifinals")
-        sf_col.add_spacer(44)   # align A semis with A quarterfinals
+        sf_col.add_spacer(40)   # align A semis with A quarterfinals
         sf_col.add_half_label("BRACKET A")
         sf_col.add_card(self._make_card(sf_a, state, logo_cache))
-        sf_col.add_spacer(60)
+        sf_col.add_spacer(116)
         sf_col.add_half_label("BRACKET B")
         sf_col.add_card(self._make_card(sf_b, state, logo_cache))
         sf_col.add_stretch()
@@ -141,7 +141,7 @@ class BracketView(QScrollArea):
 
         # ── Final column ───────────────────────────────────────────────────
         fin_col = _BracketColumn("Grand Final")
-        fin_col.add_spacer(120)
+        fin_col.add_spacer(178)
         fin_col.add_card(self._make_card(final, state, logo_cache))
         fin_col.add_stretch()
         self._content_layout.addWidget(fin_col)
@@ -151,13 +151,7 @@ class BracketView(QScrollArea):
     def _build_logo_cache(self, state: BracketState) -> Dict[str, Optional[str]]:
         cache: Dict[str, Optional[str]] = {}
         for team_id in state.teams:
-            for ext in (".svg", ".png", ".webp", ".jpg"):
-                p = self.cache_dir / f"{team_id}{ext}"
-                if p.exists():
-                    cache[team_id] = str(p)
-                    break
-            else:
-                cache[team_id] = None
+            cache[team_id] = find_local_logo(self.cache_dir, team_id)
         return cache
 
     def _make_card(

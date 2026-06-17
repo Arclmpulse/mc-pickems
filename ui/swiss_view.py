@@ -18,7 +18,7 @@ from PyQt6.QtWidgets import (
 from data.manager import TournamentManager
 from engine.swiss import SwissState, MatchInfo, TeamRecord, get_final_standings
 from ui.match_card import MatchCard
-from ui.utils import set_prop, ElidedLabel
+from ui.utils import set_prop, ElidedLabel, find_local_logo, load_logo
 
 
 # W-L records for teams that have advanced (3 wins) or eliminated (3 losses)
@@ -146,6 +146,22 @@ class FinalResultColumn(QWidget):
         seed_lbl.setFixedWidth(26)
         rl.addWidget(seed_lbl)
 
+        # Team logo or initials
+        logo_path = team.logo_path or find_local_logo(cache_dir, team.team_id)
+        logo_pm = load_logo(logo_path, 18)
+        if logo_pm:
+            logo_lbl = QLabel()
+            logo_lbl.setPixmap(logo_pm)
+            logo_lbl.setFixedSize(20, 20)
+            logo_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            rl.addWidget(logo_lbl)
+        else:
+            init_lbl = QLabel(team.name[:2].upper())
+            init_lbl.setObjectName("initials-label")
+            init_lbl.setFixedSize(20, 20)
+            init_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            rl.addWidget(init_lbl)
+
         name_lbl = ElidedLabel(team.name)
         name_lbl.setObjectName("final-name")
         rl.addWidget(name_lbl, 1)
@@ -219,12 +235,7 @@ class SwissView(QScrollArea):
         self._build_final_column(state)
 
     def _find_logo(self, team_id: str) -> Optional[str]:
-        """Check the cache dir for a logo file."""
-        for ext in (".svg", ".png", ".webp", ".jpg"):
-            p = self.cache_dir / f"{team_id}{ext}"
-            if p.exists():
-                return str(p)
-        return None
+        return find_local_logo(self.cache_dir, team_id)
 
     def _build_round_columns(self, state: SwissState, logo_cache: Dict[str, Optional[str]]) -> None:
         num_generated = state.num_rounds
@@ -247,7 +258,7 @@ class SwissView(QScrollArea):
                 col.add_placeholder(msg)
 
             col.add_stretch()
-            self._content_layout.addWidget(col)
+            self._content_layout.addWidget(col, 1)
 
     def _populate_round_column(
         self,
@@ -266,20 +277,27 @@ class SwissView(QScrollArea):
             return (-int(w), int(l))
         groups = sorted({m.wl_group for m in matches}, key=_wl_key)
         group_str = " / ".join(groups) if groups else ""
-        col.set_subtitle(f"{group_str}  ·  {type_str}")
+
+        # Check if round has results to show lock symbol
+        round_results = self.manager._results.get(self.stage_config["id"], {}).get(f"round_{round_num}", [])
+        lock_str = "  🔒" if round_results else ""
+        col.set_subtitle(f"{group_str}  ·  {type_str}{lock_str}")
 
         # Group matches by W-L
         by_wl: Dict[str, List[MatchInfo]] = {}
         for m in matches:
             by_wl.setdefault(m.wl_group, []).append(m)
 
+        col.add_stretch()  # Push content down from header
         first_group = True
         for wl in sorted(by_wl.keys(), key=_wl_key):
+            if not first_group:
+                col.add_stretch()  # Add space between different W-L groups
+            first_group = False
+
             grp_matches = by_wl[wl]
             mt = grp_matches[0].match_type
-            if not first_group or len(by_wl) > 1:
-                col.add_group_label(f"{wl}  ·  {'Bo3' if mt == 'bo3' else 'Bo1'}")
-            first_group = False
+            col.add_group_label(f"{wl}  ·  {'Bo3' if mt == 'bo3' else 'Bo1'}")
 
             for match in grp_matches:
                 t1 = state.teams[match.team1_id]
@@ -319,7 +337,7 @@ class SwissView(QScrollArea):
             return
         col = FinalResultColumn()
         col.populate(standings, self.cache_dir)
-        self._content_layout.addWidget(col)
+        self._content_layout.addWidget(col, 1)
 
     # ── Signals ───────────────────────────────────────────────────────────────
 

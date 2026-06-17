@@ -1,0 +1,12 @@
+# Python compiled bytecode
+__pycache__/
+*.pyc
+
+# Local user picks/saves
+saves/
+
+# Local match results (edit at the end of each day)
+**/results.json
+
+# Local logo cache
+cache/

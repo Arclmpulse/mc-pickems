@@ -8,22 +8,86 @@
       "name": "Stage 1",
       "type": "swiss",
       "teams": [
-        { "id": "navi",      "name": "Natus Vincere",  "seed": 1 },
-        { "id": "vitality",  "name": "Team Vitality",  "seed": 2 },
-        { "id": "spirit",    "name": "Team Spirit",    "seed": 3 },
-        { "id": "faze",      "name": "FaZe Clan",      "seed": 4 },
-        { "id": "g2",        "name": "G2 Esports",     "seed": 5 },
-        { "id": "nip",       "name": "NIP",            "seed": 6 },
-        { "id": "heroic",    "name": "Heroic",         "seed": 7 },
-        { "id": "mouz",      "name": "MOUZ",           "seed": 8 },
-        { "id": "cloud9",    "name": "Cloud9",         "seed": 9 },
-        { "id": "ence",      "name": "ENCE",           "seed": 10 },
-        { "id": "mibr",      "name": "MIBR",           "seed": 11 },
-        { "id": "apeks",     "name": "Apeks",          "seed": 12 },
-        { "id": "fnatic",    "name": "Fnatic",         "seed": 13 },
-        { "id": "imperial",  "name": "Imperial",       "seed": 14 },
-        { "id": "liquid",    "name": "Team Liquid",    "seed": 15 },
-        { "id": "complexity","name": "Complexity",     "seed": 16 }
+        {
+          "id": "gamerlegion",
+          "name": "GamerLegion",
+          "seed": 1
+        },
+        {
+          "id": "b8",
+          "name": "B8",
+          "seed": 2
+        },
+        {
+          "id": "heroic",
+          "name": "Heroic",
+          "seed": 3
+        },
+        {
+          "id": "betboom",
+          "name": "BetBoom Team",
+          "seed": 4
+        },
+        {
+          "id": "big",
+          "name": "BIG Clan",
+          "seed": 5
+        },
+        {
+          "id": "m80",
+          "name": "M80",
+          "seed": 6
+        },
+        {
+          "id": "mibr",
+          "name": "MIBR",
+          "seed": 7
+        },
+        {
+          "id": "sinners",
+          "name": "SINNERS",
+          "seed": 8
+        },
+        {
+          "id": "nrg",
+          "name": "NRG",
+          "seed": 9
+        },
+        {
+          "id": "tyloo",
+          "name": "Tyloo",
+          "seed": 10
+        },
+        {
+          "id": "sharks",
+          "name": "Sharks",
+          "seed": 11
+        },
+        {
+          "id": "gg",
+          "name": "Gaimin Gladiators",
+          "seed": 12
+        },
+        {
+          "id": "liquid",
+          "name": "Team Liquid",
+          "seed": 13
+        },
+        {
+          "id": "lvg",
+          "name": "Lynn Vision",
+          "seed": 14
+        },
+        {
+          "id": "thunderdownunder",
+          "name": "THUNDER downUNDER",
+          "seed": 15
+        },
+        {
+          "id": "flyquest",
+          "name": "FlyQuest",
+          "seed": 16
+        }
       ]
     },
     {
@@ -31,22 +95,86 @@
       "name": "Stage 2",
       "type": "swiss",
       "teams": [
-        { "id": "navi",     "name": "Natus Vincere",  "seed": 1 },
-        { "id": "vitality", "name": "Team Vitality",  "seed": 2 },
-        { "id": "spirit",   "name": "Team Spirit",    "seed": 3 },
-        { "id": "faze",     "name": "FaZe Clan",      "seed": 4 },
-        { "id": "g2",       "name": "G2 Esports",     "seed": 5 },
-        { "id": "nip",      "name": "NIP",            "seed": 6 },
-        { "id": "heroic",   "name": "Heroic",         "seed": 7 },
-        { "id": "mouz",     "name": "MOUZ",           "seed": 8 },
-        { "id": "stage1_adv1", "name": "Stage 1 Qualifier #1", "seed": 9 },
-        { "id": "stage1_adv2", "name": "Stage 1 Qualifier #2", "seed": 10 },
-        { "id": "stage1_adv3", "name": "Stage 1 Qualifier #3", "seed": 11 },
-        { "id": "stage1_adv4", "name": "Stage 1 Qualifier #4", "seed": 12 },
-        { "id": "stage1_adv5", "name": "Stage 1 Qualifier #5", "seed": 13 },
-        { "id": "stage1_adv6", "name": "Stage 1 Qualifier #6", "seed": 14 },
-        { "id": "stage1_adv7", "name": "Stage 1 Qualifier #7", "seed": 15 },
-        { "id": "stage1_adv8", "name": "Stage 1 Qualifier #8", "seed": 16 }
+        {
+          "id": "fut",
+          "name": "FUT Esports",
+          "seed": 1
+        },
+        {
+          "id": "spirit",
+          "name": "Team Spirit",
+          "seed": 2
+        },
+        {
+          "id": "astralis",
+          "name": "Astralis",
+          "seed": 3
+        },
+        {
+          "id": "g2",
+          "name": "G2 Esports",
+          "seed": 4
+        },
+        {
+          "id": "legacy",
+          "name": "Legacy",
+          "seed": 5
+        },
+        {
+          "id": "paiN",
+          "name": "paiN Gaming",
+          "seed": 6
+        },
+        {
+          "id": "monte",
+          "name": "Monte",
+          "seed": 7
+        },
+        {
+          "id": "9z",
+          "name": "9z Team",
+          "seed": 8
+        },
+        {
+          "id": "stage1_adv1",
+          "name": "Stage 1 Qualifier #1",
+          "seed": 9
+        },
+        {
+          "id": "stage1_adv2",
+          "name": "Stage 1 Qualifier #2",
+          "seed": 10
+        },
+        {
+          "id": "stage1_adv3",
+          "name": "Stage 1 Qualifier #3",
+          "seed": 11
+        },
+        {
+          "id": "stage1_adv4",
+          "name": "Stage 1 Qualifier #4",
+          "seed": 12
+        },
+        {
+          "id": "stage1_adv5",
+          "name": "Stage 1 Qualifier #5",
+          "seed": 13
+        },
+        {
+          "id": "stage1_adv6",
+          "name": "Stage 1 Qualifier #6",
+          "seed": 14
+        },
+        {
+          "id": "stage1_adv7",
+          "name": "Stage 1 Qualifier #7",
+          "seed": 15
+        },
+        {
+          "id": "stage1_adv8",
+          "name": "Stage 1 Qualifier #8",
+          "seed": 16
+        }
       ]
     },
     {
@@ -54,22 +182,86 @@
       "name": "Stage 3",
       "type": "swiss",
       "teams": [
-        { "id": "navi",     "name": "Natus Vincere",  "seed": 1 },
-        { "id": "vitality", "name": "Team Vitality",  "seed": 2 },
-        { "id": "spirit",   "name": "Team Spirit",    "seed": 3 },
-        { "id": "faze",     "name": "FaZe Clan",      "seed": 4 },
-        { "id": "g2",       "name": "G2 Esports",     "seed": 5 },
-        { "id": "nip",      "name": "NIP",            "seed": 6 },
-        { "id": "heroic",   "name": "Heroic",         "seed": 7 },
-        { "id": "mouz",     "name": "MOUZ",           "seed": 8 },
-        { "id": "stage2_adv1", "name": "Stage 2 Qualifier #1", "seed": 9 },
-        { "id": "stage2_adv2", "name": "Stage 2 Qualifier #2", "seed": 10 },
-        { "id": "stage2_adv3", "name": "Stage 2 Qualifier #3", "seed": 11 },
-        { "id": "stage2_adv4", "name": "Stage 2 Qualifier #4", "seed": 12 },
-        { "id": "stage2_adv5", "name": "Stage 2 Qualifier #5", "seed": 13 },
-        { "id": "stage2_adv6", "name": "Stage 2 Qualifier #6", "seed": 14 },
-        { "id": "stage2_adv7", "name": "Stage 2 Qualifier #7", "seed": 15 },
-        { "id": "stage2_adv8", "name": "Stage 2 Qualifier #8", "seed": 16 }
+        {
+          "id": "vitality",
+          "name": "Team Vitality",
+          "seed": 1
+        },
+        {
+          "id": "navi",
+          "name": "Natus Vincere",
+          "seed": 2
+        },
+        {
+          "id": "falcons",
+          "name": "Team Falcons",
+          "seed": 3
+        },
+        {
+          "id": "mongolz",
+          "name": "The MongolZ",
+          "seed": 4
+        },
+        {
+          "id": "parivision",
+          "name": "PARIVISION",
+          "seed": 5
+        },
+        {
+          "id": "aurora",
+          "name": "Aurora",
+          "seed": 6
+        },
+        {
+          "id": "furia",
+          "name": "FURIA",
+          "seed": 7
+        },
+        {
+          "id": "mouz",
+          "name": "MOUZ",
+          "seed": 8
+        },
+        {
+          "id": "stage2_adv1",
+          "name": "Stage 2 Qualifier #1",
+          "seed": 9
+        },
+        {
+          "id": "stage2_adv2",
+          "name": "Stage 2 Qualifier #2",
+          "seed": 10
+        },
+        {
+          "id": "stage2_adv3",
+          "name": "Stage 2 Qualifier #3",
+          "seed": 11
+        },
+        {
+          "id": "stage2_adv4",
+          "name": "Stage 2 Qualifier #4",
+          "seed": 12
+        },
+        {
+          "id": "stage2_adv5",
+          "name": "Stage 2 Qualifier #5",
+          "seed": 13
+        },
+        {
+          "id": "stage2_adv6",
+          "name": "Stage 2 Qualifier #6",
+          "seed": 14
+        },
+        {
+          "id": "stage2_adv7",
+          "name": "Stage 2 Qualifier #7",
+          "seed": 15
+        },
+        {
+          "id": "stage2_adv8",
+          "name": "Stage 2 Qualifier #8",
+          "seed": 16
+        }
       ]
     },
     {
@@ -77,14 +269,46 @@
       "name": "Legends",
       "type": "single_elim",
       "teams": [
-        { "id": "stage3_adv1", "name": "Stage 3 Qualifier #1", "seed": 1 },
-        { "id": "stage3_adv2", "name": "Stage 3 Qualifier #2", "seed": 2 },
-        { "id": "stage3_adv3", "name": "Stage 3 Qualifier #3", "seed": 3 },
-        { "id": "stage3_adv4", "name": "Stage 3 Qualifier #4", "seed": 4 },
-        { "id": "stage3_adv5", "name": "Stage 3 Qualifier #5", "seed": 5 },
-        { "id": "stage3_adv6", "name": "Stage 3 Qualifier #6", "seed": 6 },
-        { "id": "stage3_adv7", "name": "Stage 3 Qualifier #7", "seed": 7 },
-        { "id": "stage3_adv8", "name": "Stage 3 Qualifier #8", "seed": 8 }
+        {
+          "id": "stage3_adv1",
+          "name": "Stage 3 Qualifier #1",
+          "seed": 1
+        },
+        {
+          "id": "stage3_adv2",
+          "name": "Stage 3 Qualifier #2",
+          "seed": 2
+        },
+        {
+          "id": "stage3_adv3",
+          "name": "Stage 3 Qualifier #3",
+          "seed": 3
+        },
+        {
+          "id": "stage3_adv4",
+          "name": "Stage 3 Qualifier #4",
+          "seed": 4
+        },
+        {
+          "id": "stage3_adv5",
+          "name": "Stage 3 Qualifier #5",
+          "seed": 5
+        },
+        {
+          "id": "stage3_adv6",
+          "name": "Stage 3 Qualifier #6",
+          "seed": 6
+        },
+        {
+          "id": "stage3_adv7",
+          "name": "Stage 3 Qualifier #7",
+          "seed": 7
+        },
+        {
+          "id": "stage3_adv8",
+          "name": "Stage 3 Qualifier #8",
+          "seed": 8
+        }
       ]
     }
   ]

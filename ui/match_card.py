@@ -162,6 +162,15 @@ class MatchCard(QWidget):
             spacer.setFixedHeight(14)
             layout.addWidget(spacer)
 
+        # Container for the two team cards (the matchup box)
+        self.container = QWidget()
+        self.container.setObjectName("matchup-box")
+        self.container.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
+
+        container_layout = QVBoxLayout(self.container)
+        container_layout.setContentsMargins(0, 0, 0, 0)
+        container_layout.setSpacing(0)
+
         self.card1 = TeamCard(
             team1_id, team1_name, team1_seed, team1_wins, team1_losses,
             is_top=True, logo_path=logo1_path,
@@ -171,8 +180,9 @@ class MatchCard(QWidget):
             is_top=False, logo_path=logo2_path,
         )
 
-        layout.addWidget(self.card1)
-        layout.addWidget(self.card2)
+        container_layout.addWidget(self.card1)
+        container_layout.addWidget(self.card2)
+        layout.addWidget(self.container)
 
         self.card1.clicked.connect(lambda: self.pick_made.emit(match_id, team1_id))
         self.card2.clicked.connect(lambda: self.pick_made.emit(match_id, team2_id))
@@ -184,17 +194,7 @@ class MatchCard(QWidget):
         is_locked: bool,
     ) -> None:
         """
-        Compute and apply the visual state for both team cards.
-
-        Rules:
-          If result known:
-            Winner + picked  → "correct"
-            Winner not picked → "winner"
-            Loser + picked   → "wrong"
-            Loser not picked → "loser"
-          If no result:
-            Picked team      → "picked"
-            Other team       → "unpicked"
+        Compute and apply the visual state for both team cards and the matchup box.
         """
         for card in (self.card1, self.card2):
             tid = card.team_id
@@ -208,3 +208,10 @@ class MatchCard(QWidget):
             else:
                 card.set_state("default")
             card.set_locked(is_locked)
+
+        # Apply match-level outcome on container for box highlighting
+        if actual_winner_id and picked_id:
+            outcome = "correct" if picked_id == actual_winner_id else "wrong"
+        else:
+            outcome = "none"
+        set_prop(self.container, "outcome", outcome)

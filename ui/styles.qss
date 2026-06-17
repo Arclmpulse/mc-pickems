@@ -188,8 +188,7 @@ QPushButton#stage-tab[active="true"] {
 /* ── Round Column ──────────────────────────────────────────────── */
 QWidget#round-column {
     background: transparent;
-    min-width: 140px;
-    max-width: 280px;
+    min-width: 180px;
 }
 
 QWidget#round-header {
@@ -231,101 +230,94 @@ QLabel#bo3-badge {
     letter-spacing: 0.5px;
 }
 
-/* ── Team Card ─────────────────────────────────────────────────── */
-QWidget#team-card {
+/* ── Matchup Box ────────────────────────────────────────────────── */
+QWidget#matchup-box {
     background: #161b22;
     border: 1px solid #21262d;
+    border-radius: 6px;
+}
+QWidget#matchup-box[outcome="correct"] {
+    border: 1px solid #1a4a2e;
+    border-left: 3px solid #2ea44f;
+}
+QWidget#matchup-box[outcome="wrong"] {
+    border: 1px solid #4a1a1e;
+    border-left: 3px solid #da3633;
+}
+
+/* ── Team Card ─────────────────────────────────────────────────── */
+QWidget#team-card {
+    background: transparent;
+    border: none;
     min-height: 36px;
     max-height: 36px;
 }
-QWidget#team-card[position="top"] {
+QWidget#team-card[state="default"]:hover {
+    background: #1c2333;
+}
+QWidget#team-card[position="top"][state="default"]:hover {
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
-    border-bottom: none;
 }
-QWidget#team-card[position="bottom"] {
+QWidget#team-card[position="bottom"][state="default"]:hover {
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
-}
-QWidget#team-card:hover {
-    background: #1c2333;
-    border-color: #30363d;
 }
 /* Picked (no result yet) */
 QWidget#team-card[state="picked"] {
     background: #0d2a18;
-    border-left: 3px solid #3fb950;
-    border-color: #1a4a2e;
 }
 QWidget#team-card[position="top"][state="picked"] {
     border-top-left-radius: 5px; border-top-right-radius: 5px;
-    border-bottom: none;
 }
 QWidget#team-card[position="bottom"][state="picked"] {
     border-bottom-left-radius: 5px; border-bottom-right-radius: 5px;
-    border-top: 1px solid #1a4a2e;
 }
-/* Unpicked in pairing (no result yet) */
-QWidget#team-card[state="unpicked"] {
-    background: #161b22;
-    border: 1px solid #21262d;
+QWidget#team-card[state="picked"]:hover {
+    background: #11361e;
 }
-/* Correct prediction */
-QWidget#team-card[state="correct"] {
+/* Correct prediction / Winner */
+QWidget#team-card[state="correct"],
+QWidget#team-card[state="winner"] {
     background: #0d2a18;
-    border-left: 3px solid #3fb950;
-    border-color: #1a4a2e;
 }
-QWidget#team-card[position="top"][state="correct"] {
+QWidget#team-card[position="top"][state="correct"],
+QWidget#team-card[position="top"][state="winner"] {
     border-top-left-radius: 5px; border-top-right-radius: 5px;
-    border-bottom: none;
 }
-QWidget#team-card[position="bottom"][state="correct"] {
+QWidget#team-card[position="bottom"][state="correct"],
+QWidget#team-card[position="bottom"][state="winner"] {
     border-bottom-left-radius: 5px; border-bottom-right-radius: 5px;
-    border-top: 1px solid #1a4a2e;
 }
 /* Wrong prediction */
 QWidget#team-card[state="wrong"] {
     background: #2d0f12;
-    border-left: 3px solid #f85149;
-    border-color: #4a1a1e;
 }
 QWidget#team-card[position="top"][state="wrong"] {
     border-top-left-radius: 5px; border-top-right-radius: 5px;
-    border-bottom: none;
 }
 QWidget#team-card[position="bottom"][state="wrong"] {
     border-bottom-left-radius: 5px; border-bottom-right-radius: 5px;
-    border-top: 1px solid #4a1a1e;
-}
-/* Actual winner (not picked) */
-QWidget#team-card[state="winner"] {
-    background: #0d2a18;
-    border-left: 3px solid #3fb950;
-    border-color: #1a4a2e;
-}
-QWidget#team-card[position="top"][state="winner"] {
-    border-top-left-radius: 5px; border-top-right-radius: 5px;
-    border-bottom: none;
-}
-QWidget#team-card[position="bottom"][state="winner"] {
-    border-bottom-left-radius: 5px; border-bottom-right-radius: 5px;
-    border-top: 1px solid #1a4a2e;
-}
-/* Loser (actual result known, this team lost) */
-QWidget#team-card[state="loser"] {
-    background: #0d1117;
-    border-color: #21262d;
 }
 /* Advanced from stage */
 QWidget#team-card[state="advanced"] {
     background: #0a1c30;
-    border-color: #1c3250;
+}
+QWidget#team-card[position="top"][state="advanced"] {
+    border-top-left-radius: 5px; border-top-right-radius: 5px;
+}
+QWidget#team-card[position="bottom"][state="advanced"] {
+    border-bottom-left-radius: 5px; border-bottom-right-radius: 5px;
 }
 /* Eliminated from stage */
 QWidget#team-card[state="eliminated"] {
     background: #180d0d;
-    border-color: #2d1515;
+}
+QWidget#team-card[position="top"][state="eliminated"] {
+    border-top-left-radius: 5px; border-top-right-radius: 5px;
+}
+QWidget#team-card[position="bottom"][state="eliminated"] {
+    border-bottom-left-radius: 5px; border-bottom-right-radius: 5px;
 }
 
 /* Team card label styling */
@@ -356,19 +348,18 @@ QLabel#initials-label {
 }
 /* Override text colors for specific states */
 QWidget#team-card[state="picked"] QLabel#team-name-label { color: #3fb950; }
-QWidget#team-card[state="unpicked"] QLabel#team-name-label { color: #f85149; }
+QWidget#team-card[state="unpicked"] QLabel#team-name-label { color: #8b949e; }
 QWidget#team-card[state="correct"] QLabel#team-name-label { color: #3fb950; }
 QWidget#team-card[state="wrong"] QLabel#team-name-label { color: #f85149; }
 QWidget#team-card[state="winner"] QLabel#team-name-label { color: #3fb950; }
-QWidget#team-card[state="loser"] QLabel#team-name-label { color: #484f58; }
+QWidget#team-card[state="loser"] QLabel#team-name-label { color: #f85149; }
 QWidget#team-card[state="loser"] QLabel#seed-label { color: #30363d; }
 QWidget#team-card[state="eliminated"] QLabel#team-name-label { color: #4a2020; }
 QWidget#team-card[state="eliminated"] QLabel#seed-label { color: #30363d; }
 
 /* ── Final Result Column ───────────────────────────────────────── */
 QWidget#final-column {
-    min-width: 140px;
-    max-width: 280px;
+    min-width: 180px;
     background: transparent;
 }
 

@@ -47,6 +47,8 @@ class MainWindow(QMainWindow):
         self._current_stage_idx: int = 0
         self._stage_tab_buttons: List[QPushButton] = []
         self._current_view: Optional[QWidget] = None
+        self._stage_views = {}
+        self._stages_needing_refresh = set()
 
         self._setup_ui()
 
@@ -144,6 +146,16 @@ class MainWindow(QMainWindow):
                 pass
             self.manager.deleteLater()
 
+        # Clear old views from stack
+        while self._stack.count():
+            widget = self._stack.widget(0)
+            self._stack.removeWidget(widget)
+            widget.deleteLater()
+
+        self._stage_views.clear()
+        self._stages_needing_refresh.clear()
+        self._current_view = None
+
         self.manager = TournamentManager(tournament_dir, str(self._saves_dir))
         self.manager.state_changed.connect(self._on_state_changed)
 
@@ -189,28 +201,32 @@ class MainWindow(QMainWindow):
         for i, btn in enumerate(self._stage_tab_buttons):
             set_prop(btn, "active", "true" if i == idx else "false")
 
-        # Destroy old view
-        if self._current_view is not None:
-            self._stack.removeWidget(self._current_view)
-            self._current_view.deleteLater()
-            self._current_view = None
-
-        stage = self.manager.stages[idx]
-
-        if stage["type"] == "swiss":
-            view = SwissView(self.manager, stage, self._cache_dir)
-            view.state_changed.connect(self._update_accuracy)
-        elif stage["type"] == "single_elim":
-            view = BracketView(self.manager, stage, self._cache_dir)
-            view.state_changed.connect(self._update_accuracy)
-        elif stage["type"] == "double_elim":
-            view = DoubleElimView(self.manager, stage, self._cache_dir)
-            view.state_changed.connect(self._update_accuracy)
+        # Get or create view
+        if idx in self._stage_views:
+            view = self._stage_views[idx]
+            self._stack.setCurrentWidget(view)
+            if idx in self._stages_needing_refresh:
+                if hasattr(view, "refresh"):
+                    view.refresh()
+                self._stages_needing_refresh.discard(idx)
         else:
-            view = QWidget()
+            stage = self.manager.stages[idx]
+            if stage["type"] == "swiss":
+                view = SwissView(self.manager, stage, self._cache_dir)
+                view.state_changed.connect(self._update_accuracy)
+            elif stage["type"] == "single_elim":
+                view = BracketView(self.manager, stage, self._cache_dir)
+                view.state_changed.connect(self._update_accuracy)
+            elif stage["type"] == "double_elim":
+                view = DoubleElimView(self.manager, stage, self._cache_dir)
+                view.state_changed.connect(self._update_accuracy)
+            else:
+                view = QWidget()
+            
+            self._stage_views[idx] = view
+            self._stack.addWidget(view)
+            self._stack.setCurrentWidget(view)
 
-        self._stack.addWidget(view)
-        self._stack.setCurrentWidget(view)
         self._current_view = view
 
         # Add beautiful fade-in transition
@@ -224,11 +240,19 @@ class MainWindow(QMainWindow):
         self._fade_anim.setEasingCurve(QEasingCurve.Type.OutQuad)
         self._fade_anim.start()
 
+        self._update_accuracy()
+
     # ── Event handlers ────────────────────────────────────────────────────────
 
     def _on_state_changed(self) -> None:
         """Called when results.json changes or a pick is made."""
-        # Refresh the current stage view
+        # Mark all other stages as needing refresh
+        if self.manager:
+            for i in range(len(self.manager.stages)):
+                if i != self._current_stage_idx:
+                    self._stages_needing_refresh.add(i)
+
+        # Refresh the current stage view immediately
         if self._current_view and hasattr(self._current_view, "refresh"):
             self._current_view.refresh()
         self._update_accuracy()
@@ -271,22 +295,58 @@ class MainWindow(QMainWindow):
         if not self.manager:
             self._accuracy_label.setText("<span style='color: #8b949e;'>✓  —</span>")
             return
-        correct, total, pct = self.manager.get_accuracy_stats()
-        if total == 0:
-            self._accuracy_label.setText("<span style='color: #8b949e;'>✓  —</span>")
+
+        # Calculate current stage accuracy
+        stage_id = None
+        if self._current_stage_idx < len(self.manager.stages):
+            stage_id = self.manager.stages[self._current_stage_idx]["id"]
+
+        stage_correct, stage_total, stage_pct = self.manager.get_accuracy_stats(stage_id=stage_id)
+        event_correct, event_total, event_pct = self.manager.get_accuracy_stats()
+
+        # Store variables for overall guess percentages across game and all games
+        game_correct, game_total, game_pct = self.manager.get_game_accuracy_stats()
+        all_games_correct, all_games_total, all_games_pct = self.manager.get_all_games_accuracy_stats()
+        self.overall_game_accuracy = game_pct
+        self.overall_all_games_accuracy = all_games_pct
+
+        if stage_total == 0:
+            stage_str = "<span style='color: #8b949e;'>Stage: —</span>"
         else:
-            self._accuracy_label.setText(
-                f"<span style='color: #3fb950; font-weight: bold;'>✓</span>  "
-                f"<span style='color: #e6edf3; font-weight: 600;'>{pct:.0f}%</span>  "
-                f"<span style='color: #8b949e;'>({correct}/{total})</span>"
+            stage_str = (
+                f"<span style='color: #8b949e;'>Stage:</span> "
+                f"<span style='color: #3fb950; font-weight: 600;'>{stage_pct:.0f}%</span> "
+                f"<span style='color: #8b949e;'>({stage_correct}/{stage_total})</span>"
             )
+
+        if event_total == 0:
+            event_str = "<span style='color: #8b949e;'>Event: —</span>"
+        else:
+            event_str = (
+                f"<span style='color: #8b949e;'>Event:</span> "
+                f"<span style='color: #3fb950; font-weight: 600;'>{event_pct:.0f}%</span> "
+                f"<span style='color: #8b949e;'>({event_correct}/{event_total})</span>"
+            )
+
+        self._accuracy_label.setText(f"{stage_str}  <span style='color: #30363d;'>|</span>  {event_str}")
 
     # ── Logo caching ──────────────────────────────────────────────────────────
 
     def _cache_logos_background(self) -> None:
-        """Download missing logos in a background thread (non-blocking)."""
+        """Download missing logos and pre-cache other tournaments' stats in a background thread (non-blocking)."""
         if not self.manager:
             return
+
+        # Discover all tournament directories to pre-cache
+        to_precache = []
+        parent_dir = self.manager.tournament_dir.parent
+        if parent_dir.exists():
+            for d in parent_dir.iterdir():
+                if d.is_dir() and d != self.manager.tournament_dir:
+                    t_json = d / "tournament.json"
+                    if t_json.exists():
+                        to_precache.append(d)
+
         teams_to_cache = []
         for stage in self.manager.stages:
             for team in stage.get("teams", []):
@@ -297,13 +357,22 @@ class MainWindow(QMainWindow):
         seen = set()
         unique = [(tid, url) for tid, url in teams_to_cache if tid not in seen and not seen.add(tid)]
 
-        if not unique:
-            return
-
         import threading
         import time
 
         def _do_cache():
+            # 1. Pre-populate tournament accuracy stats cache
+            for d in to_precache:
+                d_str = str(d)
+                if d_str not in TournamentManager._other_accuracy_cache:
+                    try:
+                        # Instantiate temporary manager to populate cache
+                        mgr = TournamentManager(d_str, str(self._saves_dir), watch=False)
+                        mgr.deleteLater()
+                    except Exception:
+                        pass
+
+            # 2. Cache logos
             for tid, url in unique:
                 self.manager.ensure_logo_cached(tid, url, self._cache_dir)
                 time.sleep(0.5)  # Be polite to logo hosts
@@ -311,6 +380,7 @@ class MainWindow(QMainWindow):
             def trigger_refresh():
                 if self._current_view and hasattr(self._current_view, "refresh"):
                     self._current_view.refresh()
+                self._update_accuracy()
             QTimer.singleShot(0, trigger_refresh)
 
         thread = threading.Thread(target=_do_cache, daemon=True)

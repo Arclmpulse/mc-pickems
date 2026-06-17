@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 Pickems — entry point.
 """
@@ -31,6 +32,7 @@ def main() -> None:
     app = QApplication(sys.argv)
     app.setApplicationName("Pickems")
     app.setOrganizationName("Pickems")
+    app.setDesktopFileName("pickems")
 
     from PyQt6.QtCore import QFileSystemWatcher
 
@@ -58,6 +60,17 @@ def main() -> None:
     font.setFamilies(["Inter", "system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "Helvetica Neue", "Arial"])
     font.setPointSize(9)
     app.setFont(font)
+
+    # Set a window icon
+    from PyQt6.QtGui import QIcon
+    icon_path = Path(__file__).parent / "tournaments" / "logo.png"
+    if not icon_path.exists():
+        icon_path = Path(__file__).parent / "icon.png"
+
+    if icon_path.exists():
+        app.setWindowIcon(QIcon(str(icon_path)))
+    else:
+        app.setWindowIcon(QIcon.fromTheme("applications-games"))
 
     window = MainWindow()
     window.show()

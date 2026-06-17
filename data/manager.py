@@ -33,7 +33,10 @@ class TournamentManager(QObject):
 
     state_changed = pyqtSignal()  # emitted when results or picks change
 
-    def __init__(self, tournament_dir: str, saves_dir: str, parent=None):
+    # Class-level cache of tournament accuracy stats: tournament_dir_path -> (correct, total)
+    _other_accuracy_cache = {}
+
+    def __init__(self, tournament_dir: str, saves_dir: str, watch: bool = True, parent=None):
         super().__init__(parent)
         self.tournament_dir = Path(tournament_dir)
         self.saves_dir = Path(saves_dir)
@@ -44,19 +47,28 @@ class TournamentManager(QObject):
         # match_id → {"picked": team_id, "locked": bool}
         self._picks: dict = {}
 
-        self._watcher = QFileSystemWatcher(self)
-        self._watcher.fileChanged.connect(self._on_results_file_changed)
-        self._watcher.directoryChanged.connect(self._on_directory_changed)
+        if watch:
+            self._watcher = QFileSystemWatcher(self)
+            self._watcher.fileChanged.connect(self._on_results_file_changed)
+            self._watcher.directoryChanged.connect(self._on_directory_changed)
+        else:
+            self._watcher = None
 
-        self._load_all()
+        self._stage_state_cache = {}
+        self._load_all(watch=watch)
 
     # ── Loading / saving ─────────────────────────────────────────────────────
 
-    def _load_all(self) -> None:
+    def _load_all(self, watch: bool = True) -> None:
+        self._stage_state_cache.clear()
         self._load_tournament()
         self._load_picks()
         self._load_results()
-        self._setup_watcher()
+        self._lock_picks_from_results()
+        self._save_picks()
+        if watch:
+            self._setup_watcher()
+        self.update_cache()
 
     def _load_tournament(self) -> None:
         path = self.tournament_dir / "tournament.json"
@@ -152,11 +164,13 @@ class TournamentManager(QObject):
 
     def _on_results_file_changed(self, path: str) -> None:
         """Called when results.json is modified (or replaced by atomic save)."""
+        self._stage_state_cache.clear()
         self._load_results()
         self._lock_picks_from_results()
         self._save_picks()
+        self.update_cache()
         # Some editors do atomic rename, removing the inode — re-add to watcher
-        if path not in self._watcher.files():
+        if self._watcher and path not in self._watcher.files():
             self._watcher.addPath(path)
         self.state_changed.emit()
 
@@ -174,18 +188,25 @@ class TournamentManager(QObject):
         Compute the full bracket state for a stage, resolving any dynamic qualifiers first.
         """
         stage_id = stage_config["id"]
+        if stage_id in self._stage_state_cache:
+            return self._stage_state_cache[stage_id]
+
         stage_type = stage_config["type"]
         teams = stage_config["teams"]
 
         resolved_teams = self._resolve_dynamic_teams(teams)
 
+        state = None
         if stage_type == "swiss":
-            return self._compute_swiss(stage_id, resolved_teams)
-        if stage_type == "single_elim":
-            return self._compute_bracket(stage_id, resolved_teams)
-        if stage_type == "double_elim":
-            return self._compute_double_elim(stage_id, resolved_teams, stage_config)
-        return None
+            state = self._compute_swiss(stage_id, resolved_teams)
+        elif stage_type == "single_elim":
+            state = self._compute_bracket(stage_id, resolved_teams)
+        elif stage_type == "double_elim":
+            state = self._compute_double_elim(stage_id, resolved_teams, stage_config)
+
+        if state is not None:
+            self._stage_state_cache[stage_id] = state
+        return state
 
     def _resolve_playin_winner(self) -> Optional[dict]:
         playin_stage = next((s for s in self.stages if s["id"] == "playin"), None)
@@ -382,6 +403,7 @@ class TournamentManager(QObject):
         """Record a pick. Returns False if the match is locked."""
         if self.is_locked(match_id):
             return False
+        self._stage_state_cache.clear()
         existing = self._picks.get(match_id, {}).get("picked")
         if existing == team_id:
             # Toggle: clicking same team again clears the pick
@@ -389,8 +411,14 @@ class TournamentManager(QObject):
         else:
             self._picks[match_id] = {"picked": team_id, "locked": False}
         self._save_picks()
+        self.update_cache()
         self.state_changed.emit()
         return True
+
+    def update_cache(self) -> None:
+        """Update the class-level cached accuracy values for this tournament."""
+        correct, total, _ = self.get_accuracy_stats()
+        self._other_accuracy_cache[str(self.tournament_dir)] = (correct, total)
 
     def is_locked(self, match_id: str) -> bool:
         return self._picks.get(match_id, {}).get("locked", False)
@@ -429,24 +457,105 @@ class TournamentManager(QObject):
 
     # ── Accuracy ──────────────────────────────────────────────────────────────
 
-    def get_accuracy_stats(self) -> Tuple[int, int, float]:
-        """Returns (correct, total, percentage)."""
+    def get_accuracy_stats(self, stage_id: Optional[str] = None) -> Tuple[int, int, float]:
+        """Returns (correct, total, percentage) for a single stage (if stage_id provided) or overall."""
         correct = total = 0
         for stage in self.stages:
-            stage_id = stage["id"]
+            current_stage_id = stage["id"]
+            if stage_id is not None and current_stage_id != stage_id:
+                continue
             state = self.compute_stage_state(stage)
             if state is None:
                 continue
             all_matches = [m for rnd in state.rounds for m in rnd]
             for m in all_matches:
                 actual = self.find_result_winner(
-                    stage_id, m.round_num, m.team1_id, m.team2_id
+                    current_stage_id, m.round_num, m.team1_id, m.team2_id
                 )
                 picked = self.get_pick(m.match_id)
                 if actual and picked:
                     total += 1
                     if picked == actual:
                         correct += 1
+        pct = (correct / total * 100) if total else 0.0
+        return correct, total, pct
+
+    def get_game_accuracy_stats(self) -> Tuple[int, int, float]:
+        """Returns (correct, total, percentage) across all tournaments of the same game."""
+        correct = 0
+        total = 0
+
+        # Include current tournament
+        cur_correct, cur_total = self._other_accuracy_cache.get(str(self.tournament_dir), (0, 0))
+        if cur_total == 0:
+            cur_correct, cur_total, _ = self.get_accuracy_stats()
+        correct += cur_correct
+        total += cur_total
+
+        # Scan for other tournaments of the same game
+        parent_dir = self.tournament_dir.parent
+        if parent_dir.exists():
+            for d in parent_dir.iterdir():
+                if d.is_dir() and d != self.tournament_dir:
+                    t_json = d / "tournament.json"
+                    if t_json.exists():
+                        d_str = str(d)
+                        if d_str in self._other_accuracy_cache:
+                            o_correct, o_total = self._other_accuracy_cache[d_str]
+                            correct += o_correct
+                            total += o_total
+                        else:
+                            try:
+                                with open(t_json, encoding="utf-8") as f:
+                                    data = json.load(f)
+                                if data.get("game", "cs") == self.game:
+                                    # Instantiate a temporary non-watching manager
+                                    other_mgr = TournamentManager(str(d), str(self.saves_dir), watch=False)
+                                    o_correct, o_total = self._other_accuracy_cache.get(d_str, (0, 0))
+                                    correct += o_correct
+                                    total += o_total
+                                    other_mgr.deleteLater()
+                            except Exception:
+                                pass
+
+        pct = (correct / total * 100) if total else 0.0
+        return correct, total, pct
+
+    def get_all_games_accuracy_stats(self) -> Tuple[int, int, float]:
+        """Returns (correct, total, percentage) across all tournaments of all games."""
+        correct = 0
+        total = 0
+
+        # Include current tournament
+        cur_correct, cur_total = self._other_accuracy_cache.get(str(self.tournament_dir), (0, 0))
+        if cur_total == 0:
+            cur_correct, cur_total, _ = self.get_accuracy_stats()
+        correct += cur_correct
+        total += cur_total
+
+        # Scan for all other tournaments
+        parent_dir = self.tournament_dir.parent
+        if parent_dir.exists():
+            for d in parent_dir.iterdir():
+                if d.is_dir() and d != self.tournament_dir:
+                    t_json = d / "tournament.json"
+                    if t_json.exists():
+                        d_str = str(d)
+                        if d_str in self._other_accuracy_cache:
+                            o_correct, o_total = self._other_accuracy_cache[d_str]
+                            correct += o_correct
+                            total += o_total
+                        else:
+                            try:
+                                # Instantiate a temporary non-watching manager
+                                other_mgr = TournamentManager(str(d), str(self.saves_dir), watch=False)
+                                o_correct, o_total = self._other_accuracy_cache.get(d_str, (0, 0))
+                                correct += o_correct
+                                total += o_total
+                                other_mgr.deleteLater()
+                            except Exception:
+                                pass
+
         pct = (correct / total * 100) if total else 0.0
         return correct, total, pct
 
