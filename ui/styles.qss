@@ -433,3 +433,110 @@ QFrame#separator {
     max-height: 1px;
     min-height: 1px;
 }
+
+/* ── Dashboard ─────────────────────────────────────────────────────── */
+
+QWidget#dashboard-hero {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+        stop:0 #161b22, stop:0.6 #0f1923, stop:1 #0d1117);
+    border: 1px solid #30363d;
+    border-radius: 10px;
+}
+
+QLabel#dashboard-hero-pct {
+    font-size: 54px;
+    font-weight: 800;
+    letter-spacing: -1px;
+}
+
+QLabel#dashboard-hero-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #e6edf3;
+    background: transparent;
+}
+
+QLabel#dashboard-hero-detail {
+    font-size: 12px;
+    color: #8b949e;
+    background: transparent;
+}
+
+QLabel#dashboard-hero-brand {
+    font-size: 17px;
+    font-weight: 700;
+    color: #21262d;
+    background: transparent;
+    letter-spacing: 0.5px;
+}
+
+QWidget#dashboard-game-card {
+    background: #161b22;
+    border: 1px solid #21262d;
+    border-radius: 10px;
+}
+
+QPushButton#dashboard-icon-btn {
+    background: #0d1117;
+    border: 1px solid #30363d;
+    border-radius: 12px;
+    padding: 4px;
+}
+QPushButton#dashboard-icon-btn:hover {
+    background: #1c2333;
+    border-color: #58a6ff;
+}
+QPushButton#dashboard-icon-btn:pressed {
+    background: #080d15;
+    border-color: #388bfd;
+}
+QPushButton#dashboard-icon-btn:disabled {
+    background: #0d1117;
+    border-color: #21262d;
+}
+
+QLabel#dashboard-game-name {
+    font-size: 17px;
+    font-weight: 700;
+    color: #e6edf3;
+    background: transparent;
+}
+
+QLabel#dashboard-overall-acc {
+    font-size: 12px;
+    background: transparent;
+}
+
+QLabel#dashboard-recents-header {
+    font-size: 10px;
+    font-weight: 700;
+    color: #484f58;
+    background: transparent;
+    letter-spacing: 0.8px;
+}
+
+QWidget#dashboard-tournament-row {
+    background: #0d1117;
+    border: 1px solid #21262d;
+    border-radius: 6px;
+}
+
+QLabel#dashboard-tournament-name {
+    font-size: 12px;
+    color: #8b949e;
+    background: transparent;
+}
+
+QLabel#dashboard-tournament-sub {
+    font-size: 11px;
+    color: #484f58;
+    background: transparent;
+}
+
+QLabel#dashboard-no-tournaments {
+    font-size: 12px;
+    color: #30363d;
+    background: transparent;
+    padding: 4px 0;
+}
+

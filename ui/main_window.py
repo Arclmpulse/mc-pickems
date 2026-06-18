@@ -23,6 +23,7 @@ from PyQt6.QtWidgets import (
 )
 
 from data.manager import TournamentManager
+from ui.dashboard_view import DashboardView
 from ui.sidebar import Sidebar
 from ui.swiss_view import SwissView
 from ui.bracket_view import BracketView
@@ -52,10 +53,8 @@ class MainWindow(QMainWindow):
 
         self._setup_ui()
 
-        # Auto-load first tournament found
-        first = self._discover_first_tournament()
-        if first:
-            self._load_tournament(first)
+        # Show dashboard home screen on startup
+        self._show_dashboard()
 
     # ── UI construction ───────────────────────────────────────────────────────
 
@@ -137,7 +136,80 @@ class MainWindow(QMainWindow):
                 return str(d)
         return None
 
+    def _show_dashboard(self) -> None:
+        """Show the one-time startup dashboard. Navigating away destroys it."""
+        self._tab_bar.setVisible(False)
+        self._name_label.setText("Pickems")
+        self._accuracy_label.setText("<span style='color: #8b949e;'>✓  —</span>")
+
+        # Hide sidebar with slide animation
+        self._set_sidebar_visible(False, animate=False)
+
+        dashboard = DashboardView(self._tournaments_dir, self._saves_dir)
+        # Cross-fade transition: fade dashboard out, then load the tournament
+        dashboard.navigate_requested.connect(self._begin_navigate)
+        dashboard._faded_out.connect(lambda: None)  # placeholder; real handler set in _begin_navigate
+        self._stack.addWidget(dashboard)
+        self._stack.setCurrentWidget(dashboard)
+        # No outer fade-in here — applying QGraphicsOpacityEffect directly to a
+        # QScrollArea prevents the viewport from laying out all its children
+        # correctly on first paint. The card stagger animations handle the intro.
+
+    def _begin_navigate(self, tournament_dir: str) -> None:
+        """Start the cross-fade-out then load the tournament."""
+        # Find the dashboard in the stack
+        dashboard = self._stack.currentWidget()
+        if isinstance(dashboard, DashboardView):
+            # Disconnect old faded_out connections and wire the real one
+            try:
+                dashboard._faded_out.disconnect()
+            except Exception:
+                pass
+            dashboard._faded_out.connect(
+                lambda d=tournament_dir: self._load_tournament(d)
+            )
+            dashboard.fade_out(220)
+        else:
+            self._load_tournament(tournament_dir)
+
+    def _set_sidebar_visible(self, visible: bool, animate: bool = True) -> None:
+        """Show or hide the sidebar, optionally with a slide animation."""
+        target_w = 210 if visible else 0
+        current_w = self.sidebar.width()
+        if current_w == target_w:
+            return
+
+        if not animate:
+            self.sidebar.setMinimumWidth(target_w)
+            self.sidebar.setMaximumWidth(target_w)
+            self.sidebar.setVisible(visible)
+            return
+
+        if visible:
+            self.sidebar.show()
+
+        self._sidebar_anim = QParallelAnimationGroup()
+        for prop in (b"minimumWidth", b"maximumWidth"):
+            a = QPropertyAnimation(self.sidebar, prop)
+            a.setDuration(280)
+            a.setStartValue(current_w)
+            a.setEndValue(target_w)
+            a.setEasingCurve(QEasingCurve.Type.InOutQuad)
+            self._sidebar_anim.addAnimation(a)
+
+        if not visible:
+            try:
+                self._sidebar_anim.finished.disconnect()
+            except Exception:
+                pass
+            self._sidebar_anim.finished.connect(self.sidebar.hide)
+
+        self._sidebar_anim.start()
+
     def _load_tournament(self, tournament_dir: str) -> None:
+        # Restore tab bar and sidebar
+        self._tab_bar.setVisible(True)
+        self._set_sidebar_visible(True, animate=True)
         # Disconnect old manager
         if self.manager:
             try:
@@ -258,57 +330,21 @@ class MainWindow(QMainWindow):
         self._update_accuracy()
 
     def _toggle_sidebar(self) -> None:
-        start_w = self.sidebar.width()
-        end_w = 0 if start_w > 100 else 210
-
-        self._sidebar_anim = QParallelAnimationGroup()
-
-        anim_min = QPropertyAnimation(self.sidebar, b"minimumWidth")
-        anim_min.setDuration(250)
-        anim_min.setStartValue(start_w)
-        anim_min.setEndValue(end_w)
-        anim_min.setEasingCurve(QEasingCurve.Type.InOutQuad)
-
-        anim_max = QPropertyAnimation(self.sidebar, b"maximumWidth")
-        anim_max.setDuration(250)
-        anim_max.setStartValue(start_w)
-        anim_max.setEndValue(end_w)
-        anim_max.setEasingCurve(QEasingCurve.Type.InOutQuad)
-
-        self._sidebar_anim.addAnimation(anim_min)
-        self._sidebar_anim.addAnimation(anim_max)
-
-        if end_w > 0:
-            self.sidebar.show()
-
-        try:
-            self._sidebar_anim.finished.disconnect()
-        except Exception:
-            pass
-
-        if end_w == 0:
-            self._sidebar_anim.finished.connect(self.sidebar.hide)
-
-        self._sidebar_anim.start()
+        visible = self.sidebar.width() <= 100
+        self._set_sidebar_visible(visible, animate=True)
 
     def _update_accuracy(self) -> None:
         if not self.manager:
             self._accuracy_label.setText("<span style='color: #8b949e;'>✓  —</span>")
             return
 
-        # Calculate current stage accuracy
+        # Stage accuracy (current tab only)
         stage_id = None
         if self._current_stage_idx < len(self.manager.stages):
             stage_id = self.manager.stages[self._current_stage_idx]["id"]
 
         stage_correct, stage_total, stage_pct = self.manager.get_accuracy_stats(stage_id=stage_id)
         event_correct, event_total, event_pct = self.manager.get_accuracy_stats()
-
-        # Store variables for overall guess percentages across game and all games
-        game_correct, game_total, game_pct = self.manager.get_game_accuracy_stats()
-        all_games_correct, all_games_total, all_games_pct = self.manager.get_all_games_accuracy_stats()
-        self.overall_game_accuracy = game_pct
-        self.overall_all_games_accuracy = all_games_pct
 
         if stage_total == 0:
             stage_str = "<span style='color: #8b949e;'>Stage: —</span>"

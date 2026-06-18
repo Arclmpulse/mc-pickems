@@ -447,6 +447,9 @@ class TournamentManager(QObject):
                 continue
             all_matches = [m for rnd in state.rounds for m in rnd]
             for m in all_matches:
+                # Skip TBD bracket slots (team IDs not yet resolved)
+                if not m.team1_id or not m.team2_id:
+                    continue
                 actual = self.find_result_winner(
                     stage_id, m.round_num, m.team1_id, m.team2_id
                 )
