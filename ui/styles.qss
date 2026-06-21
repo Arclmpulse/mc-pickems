@@ -540,3 +540,105 @@ QLabel#dashboard-no-tournaments {
     padding: 4px 0;
 }
 
+/* ── Group Stage View ─────────────────────────────────────────────────── */
+
+QFrame#group-card {
+    background: #161b22;
+    border: 1px solid #21262d;
+    border-radius: 8px;
+}
+
+QWidget#group-card-header {
+    background: #0d1117;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+QLabel#group-letter-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: #e6edf3;
+    background: transparent;
+    letter-spacing: 0.3px;
+}
+
+QLabel#group-lock-icon {
+    font-size: 10px;
+    background: transparent;
+}
+
+QWidget#group-team-row {
+    background: transparent;
+    border: none;
+    min-height: 36px;
+    max-height: 36px;
+}
+QWidget#group-team-row[zone="advance"] {
+    background: #0d2518;
+    border-left: 3px solid #238636;
+}
+QWidget#group-team-row[zone="third_advancing"] {
+    background: #0d2518;
+    border-left: 3px solid #238636;
+}
+QWidget#group-team-row[zone="third"] {
+    background: #1c2128;
+    border-left: 3px solid #484f58;
+}
+QWidget#group-team-row[zone="third_eliminated"] {
+    background: #2d0f0f;
+    border-left: 3px solid #da3633;
+}
+QWidget#group-team-row[zone="eliminate"] {
+    background: #2d0f0f;
+    border-left: 3px solid #da3633;
+}
+QWidget#group-team-row:hover {
+    filter: brightness(1.1);
+}
+
+QLabel#group-position-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: #484f58;
+    background: transparent;
+}
+
+QLabel#group-team-name {
+    font-size: 12px;
+    font-weight: 500;
+    color: #e6edf3;
+    background: transparent;
+}
+
+QWidget#group-team-row[zone="advance"] QLabel#group-team-name {
+    color: #3fb950;
+}
+QWidget#group-team-row[zone="third_advancing"] QLabel#group-team-name {
+    color: #3fb950;
+}
+QWidget#group-team-row[zone="third"] QLabel#group-team-name {
+    color: #8b949e;
+}
+QWidget#group-team-row[zone="eliminate"] QLabel#group-team-name {
+    color: #f85149;
+}
+QWidget#group-team-row[zone="third_eliminated"] QLabel#group-team-name {
+    color: #f85149;
+}
+
+QLabel#group-drag-handle {
+    font-size: 14px;
+    color: #30363d;
+    background: transparent;
+    padding: 0 2px;
+}
+QWidget#group-team-row:hover QLabel#group-drag-handle {
+    color: #484f58;
+}
+
+QListWidget#group-list {
+    background: transparent;
+    border: none;
+    outline: none;
+}

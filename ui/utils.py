@@ -10,6 +10,60 @@ from PyQt6.QtGui import QPixmap, QPainter, QFontMetrics
 from PyQt6.QtWidgets import QWidget, QLabel
 
 
+# Shared flag emoji lookup: team_id → country flag emoji.
+# Used as a fallback when no logo image is cached.
+COUNTRY_FLAG_EMOJI: dict = {
+    "mexico":        "🇲🇽",
+    "south_africa":  "🇿🇦",
+    "south_korea":   "🇰🇷",
+    "czechia":       "🇨🇿",
+    "canada":        "🇨🇦",
+    "bosnia":        "🇧🇦",
+    "qatar":         "🇶🇦",
+    "switzerland":   "🇨🇭",
+    "brazil":        "🇧🇷",
+    "morocco":       "🇲🇦",
+    "haiti":         "🇭🇹",
+    "scotland":      "🏴󠁧󠁢󠁳󠁣󠁴󠁿",
+    "usa":           "🇺🇸",
+    "paraguay":      "🇵🇾",
+    "australia":     "🇦🇺",
+    "turkey":        "🇹🇷",
+    "germany":       "🇩🇪",
+    "curacao":       "🇨🇼",
+    "ivory_coast":   "🇨🇮",
+    "ecuador":       "🇪🇨",
+    "netherlands":   "🇳🇱",
+    "japan":         "🇯🇵",
+    "sweden":        "🇸🇪",
+    "tunisia":       "🇹🇳",
+    "belgium":       "🇧🇪",
+    "egypt":         "🇪🇬",
+    "iran":          "🇮🇷",
+    "new_zealand":   "🇳🇿",
+    "spain":         "🇪🇸",
+    "cape_verde":    "🇨🇻",
+    "saudi_arabia":  "🇸🇦",
+    "uruguay":       "🇺🇾",
+    "france":        "🇫🇷",
+    "senegal":       "🇸🇳",
+    "iraq":          "🇮🇶",
+    "norway":        "🇳🇴",
+    "argentina":     "🇦🇷",
+    "algeria":       "🇩🇿",
+    "austria":       "🇦🇹",
+    "jordan":        "🇯🇴",
+    "portugal":      "🇵🇹",
+    "dr_congo":      "🇨🇩",
+    "uzbekistan":    "🇺🇿",
+    "colombia":      "🇨🇴",
+    "england":       "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
+    "croatia":       "🇭🇷",
+    "ghana":         "🇬🇭",
+    "panama":        "🇵🇦",
+}
+
+
 def set_prop(widget: QWidget, prop: str, value) -> None:
     """Set a dynamic QSS property and trigger a style refresh."""
     widget.setProperty(prop, value)

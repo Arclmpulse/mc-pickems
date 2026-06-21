@@ -220,9 +220,28 @@ class Sidebar(QWidget):
             placeholder.setStyleSheet("color: #30363d; font-size: 11px; padding: 6px 24px;")
             self.lol_section.container_layout.addWidget(placeholder)
 
-        # Default states: CS expanded, LoL collapsed
+        # ── Football section ──────────────────────────────────────────────────
+        self.football_section = GameSection("football", "Football", "⚽", tournaments_dir)
+        self._inner_layout.addWidget(self.football_section)
+
+        football_tournaments = self._discover(tournaments_dir, game="football")
+        if football_tournaments:
+            for t_dir, t_name in football_tournaments:
+                btn = QPushButton(t_name)
+                btn.setObjectName("sidebar-tournament-btn")
+                btn.clicked.connect(lambda checked, d=t_dir: self._select(d))
+                self._tournament_buttons.append(btn)
+                self._btn_paths[btn] = t_dir
+                self.football_section.container_layout.addWidget(btn)
+        else:
+            placeholder = QLabel("No tournaments found")
+            placeholder.setStyleSheet("color: #30363d; font-size: 11px; padding: 6px 24px;")
+            self.football_section.container_layout.addWidget(placeholder)
+
+        # Default states: CS expanded, others collapsed
         self.cs_section.set_expanded(True, animate=False)
         self.lol_section.set_expanded(False, animate=False)
+        self.football_section.set_expanded(False, animate=False)
 
     def _discover(self, tournaments_dir: Path, game: str) -> List[tuple]:
         """Find all tournament dirs for a given game slug."""

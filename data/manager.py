@@ -15,9 +15,11 @@ from engine.swiss import (
 )
 from engine.bracket import compute_bracket_state, BracketState
 from engine.double_elim import compute_double_elim_state, DoubleElimState
+from engine.group_stage import compute_group_state, GroupState, score_group_picks
+from engine.wc_bracket import compute_wc_bracket_state, WCBracketState
 
 
-StageState = Union[SwissState, BracketState, DoubleElimState]
+StageState = Union[SwissState, BracketState, DoubleElimState, GroupState, WCBracketState]
 
 
 class TournamentManager(QObject):
@@ -192,17 +194,26 @@ class TournamentManager(QObject):
             return self._stage_state_cache[stage_id]
 
         stage_type = stage_config["type"]
-        teams = stage_config["teams"]
-
-        resolved_teams = self._resolve_dynamic_teams(teams)
 
         state = None
         if stage_type == "swiss":
+            teams = stage_config.get("teams", [])
+            resolved_teams = self._resolve_dynamic_teams(teams)
             state = self._compute_swiss(stage_id, resolved_teams)
         elif stage_type == "single_elim":
+            teams = stage_config.get("teams", [])
+            resolved_teams = self._resolve_dynamic_teams(teams)
             state = self._compute_bracket(stage_id, resolved_teams)
         elif stage_type == "double_elim":
+            teams = stage_config.get("teams", [])
+            resolved_teams = self._resolve_dynamic_teams(teams)
             state = self._compute_double_elim(stage_id, resolved_teams, stage_config)
+        elif stage_type == "group_stage":
+            state = self._compute_group_stage(stage_id, stage_config)
+        elif stage_type == "wc_bracket":
+            teams = stage_config.get("teams", [])
+            resolved_teams = self._resolve_wc_teams(teams)
+            state = self._compute_wc_bracket(stage_id, resolved_teams)
 
         if state is not None:
             self._stage_state_cache[stage_id] = state
@@ -397,6 +408,153 @@ class TournamentManager(QObject):
 
         return compute_bracket_state(stage_id, teams, collected)
 
+    def _compute_group_stage(self, stage_id: str, stage_config: dict) -> GroupState:
+        """Compute group stage state from config + picks + results."""
+        groups_config = stage_config.get("groups", [])
+
+        # Load predicted orders from picks
+        predicted_orders: Dict[str, List[str]] = {}
+        for gconf in groups_config:
+            gid = gconf["id"]
+            match_id = f"{stage_id}_{gid}_order"
+            pick_data = self._picks.get(match_id, {})
+            picked = pick_data.get("picked")
+            if isinstance(picked, list):
+                predicted_orders[gid] = picked
+
+        # Load actual orders and third-place rankings from results.json
+        actual_orders: Dict[str, List[str]] = {}
+        stage_results = self._results.get("groups", {})
+        for gconf in groups_config:
+            gid = gconf["id"]
+            standings = stage_results.get(gid, {}).get("final_standings", [])
+            if standings:
+                actual_orders[gid] = standings
+
+        third_place_rankings: Optional[List[str]] = stage_results.get("third_place_rankings") or None
+
+        return compute_group_state(
+            stage_id, groups_config, predicted_orders, actual_orders, third_place_rankings
+        )
+
+    def _resolve_wc_teams(self, teams: List[dict]) -> List[dict]:
+        """
+        Resolve WC bracket slot IDs (1A, 2B, 3rd_1, etc.) to real team IDs
+        from the group stage state.
+        """
+        # Find the groups stage
+        groups_stage = next((s for s in self.stages if s["type"] == "group_stage"), None)
+        if not groups_stage:
+            return teams  # No resolution possible yet
+
+        group_state: Optional[GroupState] = self.compute_stage_state(groups_stage)
+        if not group_state:
+            return teams
+
+        # Build lookup: group_id → ordered team_ids
+        group_orders: Dict[str, List[str]] = {}
+        for g in group_state.groups:
+            order = g.actual_order if g.actual_order else g.predicted_order
+            group_orders[g.group_id] = order
+
+        # Map group letter to group_id
+        letter_to_gid: Dict[str, str] = {}
+        for g in group_state.groups:
+            # group_id like "group_a" → letter "A"
+            letter = g.group_id.replace("group_", "").upper()
+            letter_to_gid[letter] = g.group_id
+
+        # Find all third-place teams and rank them (simplified: use predicted order)
+        all_thirds: List[dict] = []
+        for g in group_state.groups:
+            order = g.actual_order if g.actual_order else g.predicted_order
+            if len(order) >= 3:
+                third_id = order[2]
+                # Find the team to get its name
+                team_obj = next((t for t in g.teams if t.team_id == third_id), None)
+                if team_obj:
+                    all_thirds.append({
+                        "team_id": third_id,
+                        "name": team_obj.name,
+                        "logo_url": team_obj.logo_url or "",
+                        "group_id": g.group_id,
+                    })
+
+        def _resolve_slot(slot_id: str) -> Optional[dict]:
+            """Resolve a bracket slot like 1A, 2B, 3rd_1 to team info."""
+            if slot_id.startswith("3rd_"):
+                rank = int(slot_id[4:]) - 1  # 0-indexed
+                if rank < len(all_thirds):
+                    t = all_thirds[rank]
+                    return {"id": t["team_id"], "name": t["name"], "logo_url": t["logo_url"]}
+                return None
+            if slot_id[0].isdigit():
+                finish = int(slot_id[0])   # 1=winner, 2=runner-up
+                letter = slot_id[1:].upper()
+                gid = letter_to_gid.get(letter)
+                if gid and gid in group_orders:
+                    order = group_orders[gid]
+                    idx = finish - 1
+                    if idx < len(order):
+                        tid = order[idx]
+                        team_obj = next(
+                            (t for g in group_state.groups for t in g.teams if t.team_id == tid),
+                            None
+                        )
+                        if team_obj:
+                            return {"id": tid, "name": team_obj.name, "logo_url": team_obj.logo_url or ""}
+            return None
+
+        resolved: List[dict] = []
+        for team in teams:
+            info = _resolve_slot(team["id"])
+            if info:
+                resolved.append({
+                    "id": info["id"],
+                    "name": info["name"],
+                    "seed": team["seed"],
+                    "logo_url": info.get("logo_url", ""),
+                })
+            else:
+                # Keep placeholder (not yet resolved)
+                resolved.append(team)
+        return resolved
+
+    def _compute_wc_bracket(
+        self,
+        stage_id: str,
+        teams: List[dict],
+    ) -> WCBracketState:
+        """Iteratively compute WC bracket state."""
+        collected: Dict[str, str] = {}
+
+        for _ in range(6):
+            state = compute_wc_bracket_state(stage_id, teams, collected)
+            prev_size = len(collected)
+            stage_results = self._results.get(stage_id, {})
+
+            for rnd_matches in state.rounds:
+                for m in rnd_matches:
+                    if m.match_id in collected or not m.team1_id or not m.team2_id:
+                        continue
+                    rnd_key = f"round_{m.round_num}"
+                    found = False
+                    for r in stage_results.get(rnd_key, []):
+                        w, lo = r.get("winner", ""), r.get("loser", "")
+                        if w in (m.team1_id, m.team2_id) and lo in (m.team1_id, m.team2_id):
+                            collected[m.match_id] = w
+                            found = True
+                            break
+                    if not found:
+                        p = self._picks.get(m.match_id, {}).get("picked")
+                        if p in (m.team1_id, m.team2_id):
+                            collected[m.match_id] = p
+
+            if len(collected) == prev_size:
+                break
+
+        return compute_wc_bracket_state(stage_id, teams, collected)
+
     # ── Pick management ───────────────────────────────────────────────────────
 
     def make_pick(self, match_id: str, team_id: str) -> bool:
@@ -414,6 +572,16 @@ class TournamentManager(QObject):
         self.update_cache()
         self.state_changed.emit()
         return True
+
+    def make_group_pick(self, match_id: str, order: List[str]) -> None:
+        """Record a group stage pick (full predicted ordering of team IDs)."""
+        if self.is_locked(match_id):
+            return
+        self._stage_state_cache.clear()
+        self._picks[match_id] = {"picked": order, "locked": False}
+        self._save_picks()
+        self.update_cache()
+        self.state_changed.emit()
 
     def update_cache(self) -> None:
         """Update the class-level cached accuracy values for this tournament."""
@@ -442,6 +610,9 @@ class TournamentManager(QObject):
         """Lock all picks that now have actual results."""
         for stage in self.stages:
             stage_id = stage["id"]
+            # Group stage uses a different pick structure — skip match-level locking
+            if stage.get("type") in ("group_stage",):
+                continue
             state = self.compute_stage_state(stage)
             if state is None:
                 continue
@@ -462,7 +633,8 @@ class TournamentManager(QObject):
 
     def get_accuracy_stats(self, stage_id: Optional[str] = None) -> Tuple[int, int, float]:
         """Returns (correct, total, percentage) for a single stage (if stage_id provided) or overall."""
-        correct = total = 0
+        correct_sum = 0.0
+        total_sum = 0.0
         for stage in self.stages:
             current_stage_id = stage["id"]
             if stage_id is not None and current_stage_id != stage_id:
@@ -470,17 +642,30 @@ class TournamentManager(QObject):
             state = self.compute_stage_state(stage)
             if state is None:
                 continue
-            all_matches = [m for rnd in state.rounds for m in rnd]
-            for m in all_matches:
-                actual = self.find_result_winner(
-                    current_stage_id, m.round_num, m.team1_id, m.team2_id
-                )
-                picked = self.get_pick(m.match_id)
-                if actual and picked:
-                    total += 1
-                    if picked == actual:
-                        correct += 1
-        pct = (correct / total * 100) if total else 0.0
+
+            if isinstance(state, GroupState):
+                # Hybrid group scoring: max 1.0 per group
+                for group in state.groups:
+                    earned, max_pts = score_group_picks(group)
+                    if max_pts > 0:
+                        # Scale to integer-friendly counts (multiply by 8 so 1.0 = 8 pts)
+                        total_sum += 8.0
+                        correct_sum += earned * 8.0
+            else:
+                all_matches = [m for rnd in state.rounds for m in rnd]
+                for m in all_matches:
+                    actual = self.find_result_winner(
+                        current_stage_id, m.round_num, m.team1_id, m.team2_id
+                    )
+                    picked = self.get_pick(m.match_id)
+                    if actual and picked:
+                        total_sum += 1
+                        if picked == actual:
+                            correct_sum += 1
+
+        correct = int(round(correct_sum))
+        total = int(round(total_sum))
+        pct = (correct_sum / total_sum * 100) if total_sum else 0.0
         return correct, total, pct
 
     def get_game_accuracy_stats(self) -> Tuple[int, int, float]:

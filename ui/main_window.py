@@ -28,6 +28,8 @@ from ui.sidebar import Sidebar
 from ui.swiss_view import SwissView
 from ui.bracket_view import BracketView
 from ui.double_elim_view import DoubleElimView
+from ui.group_stage_view import GroupStageView
+from ui.wc_bracket_view import WCBracketView
 from ui.utils import set_prop
 
 
@@ -291,6 +293,12 @@ class MainWindow(QMainWindow):
                 view.state_changed.connect(self._update_accuracy)
             elif stage["type"] == "double_elim":
                 view = DoubleElimView(self.manager, stage, self._cache_dir)
+                view.state_changed.connect(self._update_accuracy)
+            elif stage["type"] == "group_stage":
+                view = GroupStageView(self.manager, stage, self._cache_dir)
+                view.state_changed.connect(self._update_accuracy)
+            elif stage["type"] == "wc_bracket":
+                view = WCBracketView(self.manager, stage, self._cache_dir)
                 view.state_changed.connect(self._update_accuracy)
             else:
                 view = QWidget()

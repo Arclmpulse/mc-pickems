@@ -13,7 +13,7 @@ from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, QSizePolicy
 )
 
-from ui.utils import set_prop, load_logo, ElidedLabel
+from ui.utils import set_prop, load_logo, ElidedLabel, COUNTRY_FLAG_EMOJI
 
 
 class TeamCard(QWidget):
@@ -54,7 +54,7 @@ class TeamCard(QWidget):
         seed_lbl.setFixedWidth(26)
         layout.addWidget(seed_lbl)
 
-        # Logo or initials
+        # Logo or initials/emoji fallback
         logo_pm = load_logo(logo_path, 18)
         if logo_pm:
             logo_lbl = QLabel()
@@ -63,11 +63,19 @@ class TeamCard(QWidget):
             logo_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
             layout.addWidget(logo_lbl)
         else:
-            init_lbl = QLabel(name[:2].upper())
-            init_lbl.setObjectName("initials-label")
-            init_lbl.setFixedSize(20, 20)
-            init_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            layout.addWidget(init_lbl)
+            flag = COUNTRY_FLAG_EMOJI.get(team_id)
+            if flag:
+                flag_lbl = QLabel(flag)
+                flag_lbl.setObjectName("flag-emoji-label")
+                flag_lbl.setFixedSize(20, 20)
+                flag_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+                layout.addWidget(flag_lbl)
+            else:
+                init_lbl = QLabel(name[:2].upper())
+                init_lbl.setObjectName("initials-label")
+                init_lbl.setFixedSize(20, 20)
+                init_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+                layout.addWidget(init_lbl)
 
         # Team name
         name_lbl = ElidedLabel(name)

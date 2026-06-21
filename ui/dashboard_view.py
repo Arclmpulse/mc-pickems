@@ -32,8 +32,9 @@ from ui.utils import load_game_icon
 
 # Display metadata for known games. Unknown games fall back gracefully.
 _GAME_META: Dict[str, Tuple[str, str]] = {
-    "cs":  ("Counter-Strike", "⌖"),
-    "lol": ("League of Legends", "⚔️"),
+    "cs":       ("Counter-Strike", "⌖"),
+    "lol":      ("League of Legends", "⚔️"),
+    "football": ("Football", "⚽"),
 }
 
 
