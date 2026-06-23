@@ -116,8 +116,17 @@ class BracketView(QScrollArea):
         sf_a, sf_b = r2[0], r2[1]
         final = r3[0]
 
+        # Check lock status of each round
+        qf_locked = any(self.manager.is_locked(m.match_id) for m in r1)
+        sf_locked = any(self.manager.is_locked(m.match_id) for m in r2)
+        final_locked = any(self.manager.is_locked(m.match_id) for m in r3)
+
+        qf_title = "Quarterfinals  🔒" if qf_locked else "Quarterfinals"
+        sf_title = "Semifinals  🔒" if sf_locked else "Semifinals"
+        final_title = "Grand Final  🔒" if final_locked else "Grand Final"
+
         # ── QF column ──────────────────────────────────────────────────────
-        qf_col = _BracketColumn("Quarterfinals")
+        qf_col = _BracketColumn(qf_title)
         qf_col.add_half_label("BRACKET A")
         qf_col.add_card(self._make_card(qa1, state, logo_cache))
         qf_col.add_card(self._make_card(qa2, state, logo_cache))
@@ -129,7 +138,7 @@ class BracketView(QScrollArea):
         self._content_layout.addWidget(qf_col)
 
         # ── SF column ──────────────────────────────────────────────────────
-        sf_col = _BracketColumn("Semifinals")
+        sf_col = _BracketColumn(sf_title)
         sf_col.add_spacer(40)   # align A semis with A quarterfinals
         sf_col.add_half_label("BRACKET A")
         sf_col.add_card(self._make_card(sf_a, state, logo_cache))
@@ -140,7 +149,7 @@ class BracketView(QScrollArea):
         self._content_layout.addWidget(sf_col)
 
         # ── Final column ───────────────────────────────────────────────────
-        fin_col = _BracketColumn("Grand Final")
+        fin_col = _BracketColumn(final_title)
         fin_col.add_spacer(178)
         fin_col.add_card(self._make_card(final, state, logo_cache))
         fin_col.add_stretch()

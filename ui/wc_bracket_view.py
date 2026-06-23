@@ -100,8 +100,21 @@ class WCBracketView(QScrollArea):
 
         r32, r16, qf, sf, final_rnd = state.rounds
 
+        # Check lock status of each round
+        r32_locked = any(self.manager.is_locked(m.match_id) for m in r32)
+        r16_locked = any(self.manager.is_locked(m.match_id) for m in r16)
+        qf_locked = any(self.manager.is_locked(m.match_id) for m in qf)
+        sf_locked = any(self.manager.is_locked(m.match_id) for m in sf)
+        final_locked = any(self.manager.is_locked(m.match_id) for m in final_rnd)
+
+        r32_title = "Round of 32  🔒" if r32_locked else "Round of 32"
+        r16_title = "Round of 16  🔒" if r16_locked else "Round of 16"
+        qf_title = "Quarterfinals  🔒" if qf_locked else "Quarterfinals"
+        sf_title = "Semifinals  🔒" if sf_locked else "Semifinals"
+        final_title = "Final  🔒" if final_locked else "Final"
+
         # ── Round of 32 ─────────────────────────────────────────────────────
-        col_r32 = _WCColumn("Round of 32")
+        col_r32 = _WCColumn(r32_title)
         for m in r32:
             col_r32.add_card(self._make_card(m, state, logo_cache))
             col_r32.add_spacer(4)
@@ -109,7 +122,7 @@ class WCBracketView(QScrollArea):
         self._content_layout.addWidget(col_r32)
 
         # ── Round of 16 ─────────────────────────────────────────────────────
-        col_r16 = _WCColumn("Round of 16")
+        col_r16 = _WCColumn(r16_title)
         # Space down 1 card-height + spacer to center vs pairs
         col_r16.add_spacer(50)
         for i, m in enumerate(r16):
@@ -120,7 +133,7 @@ class WCBracketView(QScrollArea):
         self._content_layout.addWidget(col_r16)
 
         # ── Quarterfinals ────────────────────────────────────────────────────
-        col_qf = _WCColumn("Quarterfinals")
+        col_qf = _WCColumn(qf_title)
         col_qf.add_spacer(150)
         for i, m in enumerate(qf):
             col_qf.add_card(self._make_card(m, state, logo_cache))
@@ -130,7 +143,7 @@ class WCBracketView(QScrollArea):
         self._content_layout.addWidget(col_qf)
 
         # ── Semifinals ────────────────────────────────────────────────────────
-        col_sf = _WCColumn("Semifinals")
+        col_sf = _WCColumn(sf_title)
         col_sf.add_spacer(350)
         for i, m in enumerate(sf):
             col_sf.add_card(self._make_card(m, state, logo_cache))
@@ -140,7 +153,7 @@ class WCBracketView(QScrollArea):
         self._content_layout.addWidget(col_sf)
 
         # ── Final ─────────────────────────────────────────────────────────────
-        col_fin = _WCColumn("Final")
+        col_fin = _WCColumn(final_title)
         col_fin.add_spacer(800)
         col_fin.add_card(self._make_card(final_rnd[0], state, logo_cache))
         col_fin.add_stretch()

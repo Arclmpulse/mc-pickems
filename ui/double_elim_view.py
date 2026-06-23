@@ -133,11 +133,11 @@ class DoubleElimView(QScrollArea):
         self._content_layout.addWidget(divider)
 
         # Grand Final Match Column on the right
-        gf_col = _DoubleElimColumn("Grand Finals", top_spacer_height=gf_top_spacer)
         gf_match_id = f"{self.stage_id}_m6" if len(state.teams) == 4 else f"{self.stage_id}_m14"
-        
-        # Find match by ID
         gf_match = next((m for r in state.rounds for m in r if m.match_id == gf_match_id), None)
+        gf_locked = gf_match and self.manager.is_locked(gf_match.match_id)
+        gf_title = "Grand Finals  🔒" if gf_locked else "Grand Finals"
+        gf_col = _DoubleElimColumn(gf_title, top_spacer_height=gf_top_spacer)
         if gf_match:
             gf_col.add_spacer(140)
             gf_col.add_card(self._make_card(gf_match, state, logo_cache))
@@ -160,12 +160,15 @@ class DoubleElimView(QScrollArea):
         m2 = next(m for r in state.rounds for m in r if m.match_id == f"{self.stage_id}_m2")
         m3 = next(m for r in state.rounds for m in r if m.match_id == f"{self.stage_id}_m3")
 
-        u_col1 = _DoubleElimColumn("Opening Matches")
+        u1_locked = any(self.manager.is_locked(m.match_id) for m in (m1, m2))
+        u2_locked = self.manager.is_locked(m3.match_id)
+
+        u_col1 = _DoubleElimColumn("Opening Matches  🔒" if u1_locked else "Opening Matches")
         u_col1.add_card(self._make_card(m1, state, logo_cache))
         u_col1.add_card(self._make_card(m2, state, logo_cache))
         upper_row_layout.addWidget(u_col1)
 
-        u_col2 = _DoubleElimColumn("Winners Match")
+        u_col2 = _DoubleElimColumn("Winners Match  🔒" if u2_locked else "Winners Match")
         u_col2.add_spacer(44)
         u_col2.add_card(self._make_card(m3, state, logo_cache))
         u_col2.add_stretch()
@@ -187,11 +190,14 @@ class DoubleElimView(QScrollArea):
         m4 = next(m for r in state.rounds for m in r if m.match_id == f"{self.stage_id}_m4")
         m5 = next(m for r in state.rounds for m in r if m.match_id == f"{self.stage_id}_m5")
 
-        l_col1 = _DoubleElimColumn("Elimination Match")
+        l1_locked = self.manager.is_locked(m4.match_id)
+        l2_locked = self.manager.is_locked(m5.match_id)
+
+        l_col1 = _DoubleElimColumn("Elimination Match  🔒" if l1_locked else "Elimination Match")
         l_col1.add_card(self._make_card(m4, state, logo_cache))
         lower_row_layout.addWidget(l_col1)
 
-        l_col2 = _DoubleElimColumn("Decider Match")
+        l_col2 = _DoubleElimColumn("Decider Match  🔒" if l2_locked else "Decider Match")
         l_col2.add_spacer(44)
         l_col2.add_card(self._make_card(m5, state, logo_cache))
         l_col2.add_stretch()
@@ -219,7 +225,11 @@ class DoubleElimView(QScrollArea):
         m6 = next(m for r in state.rounds for m in r if m.match_id == f"{self.stage_id}_m6")
         m7 = next(m for r in state.rounds for m in r if m.match_id == f"{self.stage_id}_m7")
 
-        u_col1 = _DoubleElimColumn("Upper Round 1")
+        u1_locked = any(self.manager.is_locked(m.match_id) for m in (m1, m2, m3, m4))
+        u2_locked = any(self.manager.is_locked(m.match_id) for m in (m5, m6))
+        u3_locked = self.manager.is_locked(m7.match_id)
+
+        u_col1 = _DoubleElimColumn("Upper Round 1  🔒" if u1_locked else "Upper Round 1")
         u_col1.add_card(self._make_card(m1, state, logo_cache))
         u_col1.add_card(self._make_card(m2, state, logo_cache))
         u_col1.add_spacer(14)
@@ -227,7 +237,7 @@ class DoubleElimView(QScrollArea):
         u_col1.add_card(self._make_card(m4, state, logo_cache))
         upper_row_layout.addWidget(u_col1)
 
-        u_col2 = _DoubleElimColumn("Upper Semis")
+        u_col2 = _DoubleElimColumn("Upper Semis  🔒" if u2_locked else "Upper Semis")
         u_col2.add_spacer(44)
         u_col2.add_card(self._make_card(m5, state, logo_cache))
         u_col2.add_spacer(100)
@@ -235,7 +245,7 @@ class DoubleElimView(QScrollArea):
         u_col2.add_stretch()
         upper_row_layout.addWidget(u_col2)
 
-        u_col3 = _DoubleElimColumn("Upper Final")
+        u_col3 = _DoubleElimColumn("Upper Final  🔒" if u3_locked else "Upper Final")
         u_col3.add_spacer(120)
         u_col3.add_card(self._make_card(m7, state, logo_cache))
         u_col3.add_stretch()
@@ -266,23 +276,28 @@ class DoubleElimView(QScrollArea):
         m12 = next(m for r in state.rounds for m in r if m.match_id == f"{self.stage_id}_m12")
         m13 = next(m for r in state.rounds for m in r if m.match_id == f"{self.stage_id}_m13")
 
-        l_col1 = _DoubleElimColumn("Lower Round 1")
+        l1_locked = any(self.manager.is_locked(m.match_id) for m in (m8, m9))
+        l2_locked = any(self.manager.is_locked(m.match_id) for m in (m10, m11))
+        l3_locked = self.manager.is_locked(m12.match_id)
+        l4_locked = self.manager.is_locked(m13.match_id)
+
+        l_col1 = _DoubleElimColumn("Lower Round 1  🔒" if l1_locked else "Lower Round 1")
         l_col1.add_card(self._make_card(m8, state, logo_cache))
         l_col1.add_card(self._make_card(m9, state, logo_cache))
         lower_row_layout.addWidget(l_col1)
 
-        l_col2 = _DoubleElimColumn("Lower Round 2")
+        l_col2 = _DoubleElimColumn("Lower Round 2  🔒" if l2_locked else "Lower Round 2")
         l_col2.add_card(self._make_card(m10, state, logo_cache))
         l_col2.add_card(self._make_card(m11, state, logo_cache))
         lower_row_layout.addWidget(l_col2)
 
-        l_col3 = _DoubleElimColumn("Lower Semis")
+        l_col3 = _DoubleElimColumn("Lower Semis  🔒" if l3_locked else "Lower Semis")
         l_col3.add_spacer(44)
         l_col3.add_card(self._make_card(m12, state, logo_cache))
         l_col3.add_stretch()
         lower_row_layout.addWidget(l_col3)
 
-        l_col4 = _DoubleElimColumn("Lower Final")
+        l_col4 = _DoubleElimColumn("Lower Final  🔒" if l4_locked else "Lower Final")
         l_col4.add_spacer(44)
         l_col4.add_card(self._make_card(m13, state, logo_cache))
         l_col4.add_stretch()
