@@ -198,7 +198,6 @@ class DoubleElimView(QScrollArea):
         lower_row_layout.addWidget(l_col1)
 
         l_col2 = _DoubleElimColumn("Decider Match  🔒" if l2_locked else "Decider Match")
-        l_col2.add_spacer(44)
         l_col2.add_card(self._make_card(m5, state, logo_cache))
         l_col2.add_stretch()
         lower_row_layout.addWidget(l_col2)

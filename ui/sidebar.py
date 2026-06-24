@@ -179,6 +179,12 @@ class Sidebar(QWidget):
         scroll.setWidget(inner)
         outer.addWidget(scroll, 1)
 
+        # Version label at the bottom
+        version_lbl = QLabel("Version 3.0.2")
+        version_lbl.setObjectName("sidebar-version")
+        version_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        outer.addWidget(version_lbl)
+
         self._populate(tournaments_dir)
 
     def _populate(self, tournaments_dir: Path) -> None:
