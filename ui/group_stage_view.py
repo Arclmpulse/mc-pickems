@@ -201,8 +201,7 @@ class _GroupTeamRows(QWidget):
                 locked=group.is_locked,
                 actual_zone=("advance" if actual_pos is not None and actual_pos < 2
                              else "eliminate" if actual_pos is not None else None),
-                predicted_correct=(actual_pos is not None and
-                                   (i < 2) == (actual_pos < 2)),
+                predicted_correct=(actual_pos is not None and actual_pos == i),
             )
             if not group.is_locked:
                 row.drag_started.connect(lambda idx=i: self._begin_drag(idx))

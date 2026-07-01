@@ -180,7 +180,7 @@ class Sidebar(QWidget):
         outer.addWidget(scroll, 1)
 
         # Version label at the bottom
-        version_lbl = QLabel("Version 3.0.2")
+        version_lbl = QLabel("Version 3.1")
         version_lbl.setObjectName("sidebar-version")
         version_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
         outer.addWidget(version_lbl)

@@ -12,120 +12,312 @@
           "id": "group_a",
           "name": "Group A",
           "teams": [
-            { "id": "mexico",       "name": "Mexico",       "seed": 1 },
-            { "id": "south_africa", "name": "South Africa", "seed": 2 },
-            { "id": "south_korea",  "name": "South Korea",  "seed": 3 },
-            { "id": "czechia",      "name": "Czechia",      "seed": 4 }
+            {
+              "id": "mexico",
+              "name": "Mexico",
+              "seed": 1
+            },
+            {
+              "id": "south_africa",
+              "name": "South Africa",
+              "seed": 2
+            },
+            {
+              "id": "south_korea",
+              "name": "South Korea",
+              "seed": 3
+            },
+            {
+              "id": "czechia",
+              "name": "Czechia",
+              "seed": 4
+            }
           ]
         },
         {
           "id": "group_b",
           "name": "Group B",
           "teams": [
-            { "id": "canada",       "name": "Canada",       "seed": 1 },
-            { "id": "bosnia",       "name": "Bosnia",       "seed": 2 },
-            { "id": "qatar",        "name": "Qatar",        "seed": 3 },
-            { "id": "switzerland",  "name": "Switzerland",  "seed": 4 }
+            {
+              "id": "canada",
+              "name": "Canada",
+              "seed": 1
+            },
+            {
+              "id": "bosnia",
+              "name": "Bosnia",
+              "seed": 2
+            },
+            {
+              "id": "qatar",
+              "name": "Qatar",
+              "seed": 3
+            },
+            {
+              "id": "switzerland",
+              "name": "Switzerland",
+              "seed": 4
+            }
           ]
         },
         {
           "id": "group_c",
           "name": "Group C",
           "teams": [
-            { "id": "brazil",       "name": "Brazil",       "seed": 1 },
-            { "id": "morocco",      "name": "Morocco",      "seed": 2 },
-            { "id": "haiti",        "name": "Haiti",        "seed": 3 },
-            { "id": "scotland",     "name": "Scotland",     "seed": 4 }
+            {
+              "id": "brazil",
+              "name": "Brazil",
+              "seed": 1
+            },
+            {
+              "id": "morocco",
+              "name": "Morocco",
+              "seed": 2
+            },
+            {
+              "id": "haiti",
+              "name": "Haiti",
+              "seed": 3
+            },
+            {
+              "id": "scotland",
+              "name": "Scotland",
+              "seed": 4
+            }
           ]
         },
         {
           "id": "group_d",
           "name": "Group D",
           "teams": [
-            { "id": "usa",          "name": "United States","seed": 1 },
-            { "id": "paraguay",     "name": "Paraguay",     "seed": 2 },
-            { "id": "australia",    "name": "Australia",    "seed": 3 },
-            { "id": "turkey",       "name": "Türkiye",      "seed": 4 }
+            {
+              "id": "usa",
+              "name": "United States",
+              "seed": 1
+            },
+            {
+              "id": "paraguay",
+              "name": "Paraguay",
+              "seed": 2
+            },
+            {
+              "id": "australia",
+              "name": "Australia",
+              "seed": 3
+            },
+            {
+              "id": "turkey",
+              "name": "Türkiye",
+              "seed": 4
+            }
           ]
         },
         {
           "id": "group_e",
           "name": "Group E",
           "teams": [
-            { "id": "germany",      "name": "Germany",      "seed": 1 },
-            { "id": "curacao",      "name": "Curaçao",      "seed": 2 },
-            { "id": "ivory_coast",  "name": "Ivory Coast",  "seed": 3 },
-            { "id": "ecuador",      "name": "Ecuador",      "seed": 4 }
+            {
+              "id": "germany",
+              "name": "Germany",
+              "seed": 1
+            },
+            {
+              "id": "curacao",
+              "name": "Curaçao",
+              "seed": 2
+            },
+            {
+              "id": "ivory_coast",
+              "name": "Ivory Coast",
+              "seed": 3
+            },
+            {
+              "id": "ecuador",
+              "name": "Ecuador",
+              "seed": 4
+            }
           ]
         },
         {
           "id": "group_f",
           "name": "Group F",
           "teams": [
-            { "id": "netherlands",  "name": "Netherlands",  "seed": 1 },
-            { "id": "japan",        "name": "Japan",        "seed": 2 },
-            { "id": "sweden",       "name": "Sweden",       "seed": 3 },
-            { "id": "tunisia",      "name": "Tunisia",      "seed": 4 }
+            {
+              "id": "netherlands",
+              "name": "Netherlands",
+              "seed": 1
+            },
+            {
+              "id": "japan",
+              "name": "Japan",
+              "seed": 2
+            },
+            {
+              "id": "sweden",
+              "name": "Sweden",
+              "seed": 3
+            },
+            {
+              "id": "tunisia",
+              "name": "Tunisia",
+              "seed": 4
+            }
           ]
         },
         {
           "id": "group_g",
           "name": "Group G",
           "teams": [
-            { "id": "belgium",      "name": "Belgium",      "seed": 1 },
-            { "id": "egypt",        "name": "Egypt",        "seed": 2 },
-            { "id": "iran",         "name": "Iran",         "seed": 3 },
-            { "id": "new_zealand",  "name": "New Zealand",  "seed": 4 }
+            {
+              "id": "belgium",
+              "name": "Belgium",
+              "seed": 1
+            },
+            {
+              "id": "egypt",
+              "name": "Egypt",
+              "seed": 2
+            },
+            {
+              "id": "iran",
+              "name": "Iran",
+              "seed": 3
+            },
+            {
+              "id": "new_zealand",
+              "name": "New Zealand",
+              "seed": 4
+            }
           ]
         },
         {
           "id": "group_h",
           "name": "Group H",
           "teams": [
-            { "id": "spain",        "name": "Spain",        "seed": 1 },
-            { "id": "cape_verde",   "name": "Cape Verde",   "seed": 2 },
-            { "id": "saudi_arabia", "name": "Saudi Arabia", "seed": 3 },
-            { "id": "uruguay",      "name": "Uruguay",      "seed": 4 }
+            {
+              "id": "spain",
+              "name": "Spain",
+              "seed": 1
+            },
+            {
+              "id": "cape_verde",
+              "name": "Cabo Verde",
+              "seed": 2
+            },
+            {
+              "id": "saudi_arabia",
+              "name": "Saudi Arabia",
+              "seed": 3
+            },
+            {
+              "id": "uruguay",
+              "name": "Uruguay",
+              "seed": 4
+            }
           ]
         },
         {
           "id": "group_i",
           "name": "Group I",
           "teams": [
-            { "id": "france",       "name": "France",       "seed": 1 },
-            { "id": "senegal",      "name": "Senegal",      "seed": 2 },
-            { "id": "iraq",         "name": "Iraq",         "seed": 3 },
-            { "id": "norway",       "name": "Norway",       "seed": 4 }
+            {
+              "id": "france",
+              "name": "France",
+              "seed": 1
+            },
+            {
+              "id": "senegal",
+              "name": "Senegal",
+              "seed": 2
+            },
+            {
+              "id": "iraq",
+              "name": "Iraq",
+              "seed": 3
+            },
+            {
+              "id": "norway",
+              "name": "Norway",
+              "seed": 4
+            }
           ]
         },
         {
           "id": "group_j",
           "name": "Group J",
           "teams": [
-            { "id": "argentina",    "name": "Argentina",    "seed": 1 },
-            { "id": "algeria",      "name": "Algeria",      "seed": 2 },
-            { "id": "austria",      "name": "Austria",      "seed": 3 },
-            { "id": "jordan",       "name": "Jordan",       "seed": 4 }
+            {
+              "id": "argentina",
+              "name": "Argentina",
+              "seed": 1
+            },
+            {
+              "id": "algeria",
+              "name": "Algeria",
+              "seed": 2
+            },
+            {
+              "id": "austria",
+              "name": "Austria",
+              "seed": 3
+            },
+            {
+              "id": "jordan",
+              "name": "Jordan",
+              "seed": 4
+            }
           ]
         },
         {
           "id": "group_k",
           "name": "Group K",
           "teams": [
-            { "id": "portugal",     "name": "Portugal",     "seed": 1 },
-            { "id": "dr_congo",     "name": "DR Congo",     "seed": 2 },
-            { "id": "uzbekistan",   "name": "Uzbekistan",   "seed": 3 },
-            { "id": "colombia",     "name": "Colombia",     "seed": 4 }
+            {
+              "id": "portugal",
+              "name": "Portugal",
+              "seed": 1
+            },
+            {
+              "id": "dr_congo",
+              "name": "DR Congo",
+              "seed": 2
+            },
+            {
+              "id": "uzbekistan",
+              "name": "Uzbekistan",
+              "seed": 3
+            },
+            {
+              "id": "colombia",
+              "name": "Colombia",
+              "seed": 4
+            }
           ]
         },
         {
           "id": "group_l",
           "name": "Group L",
           "teams": [
-            { "id": "england",      "name": "England",      "seed": 1 },
-            { "id": "croatia",      "name": "Croatia",      "seed": 2 },
-            { "id": "ghana",        "name": "Ghana",        "seed": 3 },
-            { "id": "panama",       "name": "Panama",       "seed": 4 }
+            {
+              "id": "england",
+              "name": "England",
+              "seed": 1
+            },
+            {
+              "id": "croatia",
+              "name": "Croatia",
+              "seed": 2
+            },
+            {
+              "id": "ghana",
+              "name": "Ghana",
+              "seed": 3
+            },
+            {
+              "id": "panama",
+              "name": "Panama",
+              "seed": 4
+            }
           ]
         }
       ]
@@ -135,38 +327,166 @@
       "name": "Knockout",
       "type": "wc_bracket",
       "teams": [
-        { "id": "1A", "name": "Winner Group A", "seed": 1 },
-        { "id": "1B", "name": "Winner Group B", "seed": 2 },
-        { "id": "1C", "name": "Winner Group C", "seed": 3 },
-        { "id": "1D", "name": "Winner Group D", "seed": 4 },
-        { "id": "1E", "name": "Winner Group E", "seed": 5 },
-        { "id": "1F", "name": "Winner Group F", "seed": 6 },
-        { "id": "1G", "name": "Winner Group G", "seed": 7 },
-        { "id": "1H", "name": "Winner Group H", "seed": 8 },
-        { "id": "1I", "name": "Winner Group I", "seed": 9 },
-        { "id": "1J", "name": "Winner Group J", "seed": 10 },
-        { "id": "1K", "name": "Winner Group K", "seed": 11 },
-        { "id": "1L", "name": "Winner Group L", "seed": 12 },
-        { "id": "2A", "name": "Runner-up Group A", "seed": 13 },
-        { "id": "2B", "name": "Runner-up Group B", "seed": 14 },
-        { "id": "2C", "name": "Runner-up Group C", "seed": 15 },
-        { "id": "2D", "name": "Runner-up Group D", "seed": 16 },
-        { "id": "2E", "name": "Runner-up Group E", "seed": 17 },
-        { "id": "2F", "name": "Runner-up Group F", "seed": 18 },
-        { "id": "2G", "name": "Runner-up Group G", "seed": 19 },
-        { "id": "2H", "name": "Runner-up Group H", "seed": 20 },
-        { "id": "2I", "name": "Runner-up Group I", "seed": 21 },
-        { "id": "2J", "name": "Runner-up Group J", "seed": 22 },
-        { "id": "2K", "name": "Runner-up Group K", "seed": 23 },
-        { "id": "2L", "name": "Runner-up Group L", "seed": 24 },
-        { "id": "3rd_1", "name": "Best 3rd #1", "seed": 25 },
-        { "id": "3rd_2", "name": "Best 3rd #2", "seed": 26 },
-        { "id": "3rd_3", "name": "Best 3rd #3", "seed": 27 },
-        { "id": "3rd_4", "name": "Best 3rd #4", "seed": 28 },
-        { "id": "3rd_5", "name": "Best 3rd #5", "seed": 29 },
-        { "id": "3rd_6", "name": "Best 3rd #6", "seed": 30 },
-        { "id": "3rd_7", "name": "Best 3rd #7", "seed": 31 },
-        { "id": "3rd_8", "name": "Best 3rd #8", "seed": 32 }
+        {
+          "id": "1A",
+          "name": "Winner Group A",
+          "seed": 1
+        },
+        {
+          "id": "1B",
+          "name": "Winner Group B",
+          "seed": 2
+        },
+        {
+          "id": "1C",
+          "name": "Winner Group C",
+          "seed": 3
+        },
+        {
+          "id": "1D",
+          "name": "Winner Group D",
+          "seed": 4
+        },
+        {
+          "id": "1E",
+          "name": "Winner Group E",
+          "seed": 5
+        },
+        {
+          "id": "1F",
+          "name": "Winner Group F",
+          "seed": 6
+        },
+        {
+          "id": "1G",
+          "name": "Winner Group G",
+          "seed": 7
+        },
+        {
+          "id": "1H",
+          "name": "Winner Group H",
+          "seed": 8
+        },
+        {
+          "id": "1I",
+          "name": "Winner Group I",
+          "seed": 9
+        },
+        {
+          "id": "1J",
+          "name": "Winner Group J",
+          "seed": 10
+        },
+        {
+          "id": "1K",
+          "name": "Winner Group K",
+          "seed": 11
+        },
+        {
+          "id": "1L",
+          "name": "Winner Group L",
+          "seed": 12
+        },
+        {
+          "id": "2A",
+          "name": "Runner-up Group A",
+          "seed": 13
+        },
+        {
+          "id": "2B",
+          "name": "Runner-up Group B",
+          "seed": 14
+        },
+        {
+          "id": "2C",
+          "name": "Runner-up Group C",
+          "seed": 15
+        },
+        {
+          "id": "2D",
+          "name": "Runner-up Group D",
+          "seed": 16
+        },
+        {
+          "id": "2E",
+          "name": "Runner-up Group E",
+          "seed": 17
+        },
+        {
+          "id": "2F",
+          "name": "Runner-up Group F",
+          "seed": 18
+        },
+        {
+          "id": "2G",
+          "name": "Runner-up Group G",
+          "seed": 19
+        },
+        {
+          "id": "2H",
+          "name": "Runner-up Group H",
+          "seed": 20
+        },
+        {
+          "id": "2I",
+          "name": "Runner-up Group I",
+          "seed": 21
+        },
+        {
+          "id": "2J",
+          "name": "Runner-up Group J",
+          "seed": 22
+        },
+        {
+          "id": "2K",
+          "name": "Runner-up Group K",
+          "seed": 23
+        },
+        {
+          "id": "2L",
+          "name": "Runner-up Group L",
+          "seed": 24
+        },
+        {
+          "id": "3rd_1",
+          "name": "Best 3rd #1",
+          "seed": 25
+        },
+        {
+          "id": "3rd_2",
+          "name": "Best 3rd #2",
+          "seed": 26
+        },
+        {
+          "id": "3rd_3",
+          "name": "Best 3rd #3",
+          "seed": 27
+        },
+        {
+          "id": "3rd_4",
+          "name": "Best 3rd #4",
+          "seed": 28
+        },
+        {
+          "id": "3rd_5",
+          "name": "Best 3rd #5",
+          "seed": 29
+        },
+        {
+          "id": "3rd_6",
+          "name": "Best 3rd #6",
+          "seed": 30
+        },
+        {
+          "id": "3rd_7",
+          "name": "Best 3rd #7",
+          "seed": 31
+        },
+        {
+          "id": "3rd_8",
+          "name": "Best 3rd #8",
+          "seed": 32
+        }
       ]
     }
   ]

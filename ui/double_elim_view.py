@@ -351,7 +351,7 @@ class DoubleElimView(QScrollArea):
 
         picked = self.manager.get_pick(match.match_id)
         actual = self.manager.find_result_winner(
-            self.stage_id, match.round_num, match.team1_id, match.team2_id
+            self.stage_id, match.round_num, match.team1_id, match.team2_id, match.match_id
         )
         locked = self.manager.is_locked(match.match_id)
         card.apply_pick_state(picked, actual, locked)

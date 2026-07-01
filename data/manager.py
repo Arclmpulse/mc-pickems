@@ -57,12 +57,17 @@ class TournamentManager(QObject):
             self._watcher = None
 
         self._stage_state_cache = {}
+        self._actual_results = {}
         self._load_all(watch=watch)
+
+    def _clear_cache(self) -> None:
+        self._stage_state_cache.clear()
+        self._actual_results.clear()
 
     # ── Loading / saving ─────────────────────────────────────────────────────
 
     def _load_all(self, watch: bool = True) -> None:
-        self._stage_state_cache.clear()
+        self._clear_cache()
         self._load_tournament()
         self._load_picks()
         self._load_results()
@@ -166,7 +171,7 @@ class TournamentManager(QObject):
 
     def _on_results_file_changed(self, path: str) -> None:
         """Called when results.json is modified (or replaced by atomic save)."""
-        self._stage_state_cache.clear()
+        self._clear_cache()
         self._load_results()
         self._lock_picks_from_results()
         self._save_picks()
@@ -299,6 +304,13 @@ class TournamentManager(QObject):
         stage_config: dict,
     ) -> DoubleElimState:
         collected: Dict[str, str] = {}
+        matched_indices: Dict[str, tuple] = {}  # key -> (rnd_key, index)
+
+        # Clear previous cached actual results for this stage
+        for mid in list(self._actual_results.keys()):
+            if mid.startswith(f"{stage_id}_"):
+                del self._actual_results[mid]
+
         for _ in range(16):
             state = compute_double_elim_state(stage_id, teams, collected, stage_config)
             prev_size = len(collected)
@@ -309,10 +321,27 @@ class TournamentManager(QObject):
                     if m.match_id in collected or not m.team1_id or not m.team2_id:
                         continue
                     found = False
-                    for r in stage_results.get(f"round_{m.round_num}", []):
+                    results_list = []
+                    rnd_key = f"round_{m.round_num}"
+                    if isinstance(stage_results, list):
+                        results_list = stage_results
+                        list_key = "flat"
+                    elif isinstance(stage_results, dict):
+                        results_list = stage_results.get(rnd_key, [])
+                        list_key = rnd_key
+                    else:
+                        list_key = "flat"
+
+                    used_indices = {idx for (k, idx) in matched_indices.values() if k == list_key}
+
+                    for idx, r in enumerate(results_list):
+                        if idx in used_indices:
+                            continue
                         w, lo = r.get("winner", ""), r.get("loser", "")
                         if w in (m.team1_id, m.team2_id) and lo in (m.team1_id, m.team2_id):
                             collected[m.match_id] = w
+                            matched_indices[m.match_id] = (list_key, idx)
+                            self._actual_results[m.match_id] = w
                             found = True
                             break
                     if not found:
@@ -329,6 +358,7 @@ class TournamentManager(QObject):
         self,
         stage_id: str,
         matches: List[MatchInfo],
+        matched_indices: Dict[str, tuple],
     ) -> Dict[str, str]:
         """
         Build effective_winners for a list of matches.
@@ -340,11 +370,27 @@ class TournamentManager(QObject):
         for m in matches:
             rnd_key = f"round_{m.round_num}"
             found_result = False
-            for r in stage_results.get(rnd_key, []):
+            results_list = []
+            if isinstance(stage_results, list):
+                results_list = stage_results
+                list_key = "flat"
+            elif isinstance(stage_results, dict):
+                results_list = stage_results.get(rnd_key, [])
+                list_key = rnd_key
+            else:
+                list_key = "flat"
+
+            used_indices = {idx for (k, idx) in matched_indices.values() if k == list_key}
+
+            for idx, r in enumerate(results_list):
+                if idx in used_indices:
+                    continue
                 w = r.get("winner", "")
                 lo = r.get("loser", "")
                 if w in (m.team1_id, m.team2_id) and lo in (m.team1_id, m.team2_id):
                     winners[m.match_id] = w
+                    matched_indices[m.match_id] = (list_key, idx)
+                    self._actual_results[m.match_id] = w
                     found_result = True
                     break
             if not found_result:
@@ -361,13 +407,19 @@ class TournamentManager(QObject):
         Converges when no new winners are found.
         """
         collected: Dict[str, str] = {}
+        matched_indices: Dict[str, tuple] = {}
+
+        # Clear previous cached actual results for this stage
+        for mid in list(self._actual_results.keys()):
+            if mid.startswith(f"{stage_id}_"):
+                del self._actual_results[mid]
 
         for _ in range(6):  # max 5 rounds + convergence check
             state = compute_swiss_state(stage_id, teams, collected)
             prev_size = len(collected)
 
             for rnd_matches in state.rounds:
-                new_w = self._collect_round_winners(stage_id, rnd_matches)
+                new_w = self._collect_round_winners(stage_id, rnd_matches, matched_indices)
                 for mid, w in new_w.items():
                     if mid not in collected:
                         collected[mid] = w
@@ -380,6 +432,12 @@ class TournamentManager(QObject):
     def _compute_bracket(self, stage_id: str, teams: List[dict]) -> BracketState:
         """Iteratively compute bracket state."""
         collected: Dict[str, str] = {}
+        matched_indices: Dict[str, tuple] = {}  # key -> (rnd_key, index)
+
+        # Clear previous cached actual results for this stage
+        for mid in list(self._actual_results.keys()):
+            if mid.startswith(f"{stage_id}_"):
+                del self._actual_results[mid]
 
         for _ in range(4):  # max 3 rounds + convergence check
             state = compute_bracket_state(stage_id, teams, collected)
@@ -390,12 +448,28 @@ class TournamentManager(QObject):
                 for m in rnd_matches:
                     if m.match_id in collected or not m.team1_id or not m.team2_id:
                         continue
-                    rnd_key = f"round_{m.round_num}"
                     found = False
-                    for r in stage_results.get(rnd_key, []):
+                    results_list = []
+                    rnd_key = f"round_{m.round_num}"
+                    if isinstance(stage_results, list):
+                        results_list = stage_results
+                        list_key = "flat"
+                    elif isinstance(stage_results, dict):
+                        results_list = stage_results.get(rnd_key, [])
+                        list_key = rnd_key
+                    else:
+                        list_key = "flat"
+
+                    used_indices = {idx for (k, idx) in matched_indices.values() if k == list_key}
+
+                    for idx, r in enumerate(results_list):
+                        if idx in used_indices:
+                            continue
                         w, lo = r.get("winner", ""), r.get("loser", "")
                         if w in (m.team1_id, m.team2_id) and lo in (m.team1_id, m.team2_id):
                             collected[m.match_id] = w
+                            matched_indices[m.match_id] = (list_key, idx)
+                            self._actual_results[m.match_id] = w
                             found = True
                             break
                     if not found:
@@ -451,11 +525,11 @@ class TournamentManager(QObject):
         if not group_state:
             return teams
 
-        # Build lookup: group_id → ordered team_ids
+        # Build lookup: group_id → ordered team_ids (ONLY from actual locked orders)
         group_orders: Dict[str, List[str]] = {}
         for g in group_state.groups:
-            order = g.actual_order if g.actual_order else g.predicted_order
-            group_orders[g.group_id] = order
+            if g.actual_order:
+                group_orders[g.group_id] = g.actual_order
 
         # Map group letter to group_id
         letter_to_gid: Dict[str, str] = {}
@@ -464,21 +538,27 @@ class TournamentManager(QObject):
             letter = g.group_id.replace("group_", "").upper()
             letter_to_gid[letter] = g.group_id
 
-        # Find all third-place teams and rank them (simplified: use predicted order)
+        # Find and rank third-place teams ONLY if third-place rankings are known/populated in results
         all_thirds: List[dict] = []
-        for g in group_state.groups:
-            order = g.actual_order if g.actual_order else g.predicted_order
-            if len(order) >= 3:
-                third_id = order[2]
-                # Find the team to get its name
-                team_obj = next((t for t in g.teams if t.team_id == third_id), None)
-                if team_obj:
-                    all_thirds.append({
-                        "team_id": third_id,
-                        "name": team_obj.name,
-                        "logo_url": team_obj.logo_url or "",
-                        "group_id": g.group_id,
-                    })
+        if group_state.third_place_rankings_known:
+            stage_results = self._results.get(groups_stage["id"], {})
+            third_place_rankings = stage_results.get("third_place_rankings") or []
+            
+            thirds_map = {}
+            for g in group_state.groups:
+                if g.actual_order and len(g.actual_order) >= 3:
+                    third_id = g.actual_order[2]
+                    team_obj = next((t for t in g.teams if t.team_id == third_id), None)
+                    if team_obj:
+                        thirds_map[g.group_id] = {
+                            "team_id": third_id,
+                            "name": team_obj.name,
+                            "logo_url": team_obj.logo_url or "",
+                        }
+            
+            for gid in third_place_rankings:
+                if gid in thirds_map:
+                    all_thirds.append(thirds_map[gid])
 
         def _resolve_slot(slot_id: str) -> Optional[dict]:
             """Resolve a bracket slot like 1A, 2B, 3rd_1 to team info."""
@@ -527,6 +607,12 @@ class TournamentManager(QObject):
     ) -> WCBracketState:
         """Iteratively compute WC bracket state."""
         collected: Dict[str, str] = {}
+        matched_indices: Dict[str, tuple] = {}  # key -> (rnd_key, index)
+
+        # Clear previous cached actual results for this stage
+        for mid in list(self._actual_results.keys()):
+            if mid.startswith(f"{stage_id}_"):
+                del self._actual_results[mid]
 
         for _ in range(6):
             state = compute_wc_bracket_state(stage_id, teams, collected)
@@ -537,12 +623,28 @@ class TournamentManager(QObject):
                 for m in rnd_matches:
                     if m.match_id in collected or not m.team1_id or not m.team2_id:
                         continue
-                    rnd_key = f"round_{m.round_num}"
                     found = False
-                    for r in stage_results.get(rnd_key, []):
+                    results_list = []
+                    rnd_key = f"round_{m.round_num}"
+                    if isinstance(stage_results, list):
+                        results_list = stage_results
+                        list_key = "flat"
+                    elif isinstance(stage_results, dict):
+                        results_list = stage_results.get(rnd_key, [])
+                        list_key = rnd_key
+                    else:
+                        list_key = "flat"
+
+                    used_indices = {idx for (k, idx) in matched_indices.values() if k == list_key}
+
+                    for idx, r in enumerate(results_list):
+                        if idx in used_indices:
+                            continue
                         w, lo = r.get("winner", ""), r.get("loser", "")
                         if w in (m.team1_id, m.team2_id) and lo in (m.team1_id, m.team2_id):
                             collected[m.match_id] = w
+                            matched_indices[m.match_id] = (list_key, idx)
+                            self._actual_results[m.match_id] = w
                             found = True
                             break
                     if not found:
@@ -561,7 +663,7 @@ class TournamentManager(QObject):
         """Record a pick. Returns False if the match is locked."""
         if self.is_locked(match_id):
             return False
-        self._stage_state_cache.clear()
+        self._clear_cache()
         existing = self._picks.get(match_id, {}).get("picked")
         if existing == team_id:
             # Toggle: clicking same team again clears the pick
@@ -577,7 +679,7 @@ class TournamentManager(QObject):
         """Record a group stage pick (full predicted ordering of team IDs)."""
         if self.is_locked(match_id):
             return
-        self._stage_state_cache.clear()
+        self._clear_cache()
         self._picks[match_id] = {"picked": order, "locked": False}
         self._save_picks()
         self.update_cache()
@@ -595,12 +697,22 @@ class TournamentManager(QObject):
         return self._picks.get(match_id, {}).get("picked")
 
     def find_result_winner(
-        self, stage_id: str, round_num: int, team1_id: str, team2_id: str
+        self, stage_id: str, round_num: int, team1_id: str, team2_id: str, match_id: Optional[str] = None
     ) -> Optional[str]:
         """Return the actual winner from results.json, or None."""
+        if match_id:
+            return self._actual_results.get(match_id)
+
         rnd_key = f"round_{round_num}"
         teams = {team1_id, team2_id}
-        for r in self._results.get(stage_id, {}).get(rnd_key, []):
+        stage_results = self._results.get(stage_id, {})
+        results_list = []
+        if isinstance(stage_results, list):
+            results_list = stage_results
+        elif isinstance(stage_results, dict):
+            results_list = stage_results.get(rnd_key, [])
+
+        for r in results_list:
             w, lo = r.get("winner", ""), r.get("loser", "")
             if w in teams and lo in teams:
                 return w
@@ -622,12 +734,15 @@ class TournamentManager(QObject):
                 if not m.team1_id or not m.team2_id:
                     continue
                 actual = self.find_result_winner(
-                    stage_id, m.round_num, m.team1_id, m.team2_id
+                    stage_id, m.round_num, m.team1_id, m.team2_id, m.match_id
                 )
                 if actual:
                     if m.match_id not in self._picks:
                         self._picks[m.match_id] = {}
                     self._picks[m.match_id]["locked"] = True
+                else:
+                    if m.match_id in self._picks and self._picks[m.match_id].get("locked"):
+                        self._picks[m.match_id]["locked"] = False
 
     # ── Accuracy ──────────────────────────────────────────────────────────────
 
@@ -655,7 +770,7 @@ class TournamentManager(QObject):
                 all_matches = [m for rnd in state.rounds for m in rnd]
                 for m in all_matches:
                     actual = self.find_result_winner(
-                        current_stage_id, m.round_num, m.team1_id, m.team2_id
+                        current_stage_id, m.round_num, m.team1_id, m.team2_id, m.match_id
                     )
                     picked = self.get_pick(m.match_id)
                     if actual and picked:

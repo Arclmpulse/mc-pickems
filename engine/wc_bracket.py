@@ -13,23 +13,23 @@ For the picks app, we treat each R32 slot as a predictable "role":
 The engine receives teams as a flat list of 32 dicts (roles resolved by the manager).
 Match pairings are hardcoded per the FIFA 2026 bracket.
 
-Round structure (16 R32 matches numbered 1-16 for match IDs):
-  Match 1:  2A vs 2B
-  Match 2:  1C vs 2F
-  Match 3:  1D vs 3rd (slot C/D/E/F/G)     [3rd bracket slot 1]
-  Match 4:  1F vs 2C
-  Match 5:  2E vs 2I
-  Match 6:  1I vs 3rd (slot C/D/F/G/H)     [3rd bracket slot 2]
-  Match 7:  1G vs 3rd (slot A/E/H/I/J)     [3rd bracket slot 3]
-  Match 8:  USA(1D) vs 3rd (slot B/E/F/I/J) [3rd bracket slot 4]
-  Match 9:  1H vs 2J
-  Match 10: 2K vs 2L
-  Match 11: 1B vs 3rd (slot E/F/G/I/J)     [3rd bracket slot 5]
-  Match 12: 2D vs 2G
-  Match 13: 1J vs 2H
-  Match 14: 1K vs 3rd (slot D/E/I/J/L)     [3rd bracket slot 6]
-  Match 15: 1L vs 3rd (slot E/H/I/J/K)     [3rd bracket slot 7]
-  Match 16: Mexico(1A) vs 3rd (slot A/B/C/D/F) & Germany(1E) vs ... (complex)
+Round structure (16 R32 matches matching the FIFA 2026 bracket):
+  Match 1:  2A vs 2B              (Match 73)
+  Match 2:  1F vs 2C              (Match 75)
+  Match 3:  1E vs 3rd A/B/C/D/F   (Match 74) [best 3rd #1]
+  Match 4:  1I vs 3rd C/D/F/G/H   (Match 77) [best 3rd #2]
+  Match 5:  1C vs 2F              (Match 76)
+  Match 6:  2E vs 2I              (Match 78)
+  Match 7:  1A vs 3rd C/E/F/H/I   (Match 79) [best 3rd #3]
+  Match 8:  1L vs 3rd D/E/I/J/L   (Match 80) [best 3rd #4]
+  Match 9:  2K vs 2L              (Match 83)
+  Match 10: 1H vs 2J              (Match 84)
+  Match 11: 1D vs 3rd B/E/F/I/J   (Match 81) [best 3rd #5]
+  Match 12: 1G vs 3rd A/E/H/I/J   (Match 82) [best 3rd #6]
+  Match 13: 1J vs 2H              (Match 86)
+  Match 14: 2D vs 2G              (Match 88)
+  Match 15: 1B vs 3rd E/F/G/I/J   (Match 85) [best 3rd #7]
+  Match 16: 1K vs 3rd E/H/I/J/K   (Match 87) [best 3rd #8]
 
 NOTE: Implementing the full 495-scenario third-place assignment is very complex.
 For this app we simplify: the 8 advancing third-place teams are assigned to the
@@ -37,30 +37,25 @@ bracket slots in rank order (best 3rd → slot 1, 2nd best → slot 2, etc.).
 The tournament.json lists these as seeds 25-32 so the manager can resolve them
 from group state.
 
-Bracket R16 pairings (winners of R32 matches):
-  R16 Match 1: W(M1) vs W(M3)
-  R16 Match 2: W(M2) vs W(M4)  [not quite — see below]
-
-Actually FIFA's bracket structure groups the 16 R32 matches into 8 pairs for R16.
-The pairings by Wikipedia are (Match numbers as we assigned):
-  R16 m1: W(1) vs W(3)   (from group A/B/C/D/F area)
-  R16 m2: W(2) vs W(4)
-  R16 m3: W(5) vs W(7)
-  R16 m4: W(6) vs W(8)
-  R16 m5: W(9) vs W(11)
-  R16 m6: W(10) vs W(12)
-  R16 m7: W(13) vs W(15)
-  R16 m8: W(14) vs W(16)
+Bracket R16 pairings (winners of adjacent R32 matches):
+  R16 m1: W(M1) vs W(M2)          (Match 90: W73 vs W75)
+  R16 m2: W(M3) vs W(M4)          (Match 89: W74 vs W77)
+  R16 m3: W(M5) vs W(M6)          (Match 91: W76 vs W78)
+  R16 m4: W(M7) vs W(M8)          (Match 92: W79 vs W80)
+  R16 m5: W(M9) vs W(M10)         (Match 93: W83 vs W84)
+  R16 m6: W(M11) vs W(M12)        (Match 94: W81 vs W82)
+  R16 m7: W(M13) vs W(M14)        (Match 95: W86 vs W88)
+  R16 m8: W(M15) vs W(M16)        (Match 96: W85 vs W87)
 
 QF (4 matches):
-  QF1: W(R16 m1) vs W(R16 m2)
-  QF2: W(R16 m3) vs W(R16 m4)
-  QF3: W(R16 m5) vs W(R16 m6)
-  QF4: W(R16 m7) vs W(R16 m8)
+  QF1: W(R16 m1) vs W(R16 m2)     (Match 97: W89 vs W90)
+  QF2: W(R16 m3) vs W(R16 m4)     (Match 98: W91 vs W92)
+  QF3: W(R16 m5) vs W(R16 m6)     (Match 99: W93 vs W94)
+  QF4: W(R16 m7) vs W(R16 m8)     (Match 100: W95 vs W96)
 
 SF (2 matches):
-  SF1: W(QF1) vs W(QF2)
-  SF2: W(QF3) vs W(QF4)
+  SF1: W(QF1) vs W(QF2)           (Semifinal 1)
+  SF2: W(QF3) vs W(QF4)           (Semifinal 2)
 
 Final: W(SF1) vs W(SF2)
 """
@@ -104,39 +99,43 @@ class WCBracketState:
 # FIFA 2026 standard bracket fixed pairings:
 _R32_PAIRS = [
     # (slot_label, seed1, seed2)
-    ("R32-1",  14, 13),   # 2B vs 2A  (runners-up B vs A)
-    ("R32-2",   3, 18),   # 1C vs 2F
-    ("R32-3",   4, 25),   # 1D vs best 3rd #1
-    ("R32-4",   6, 15),   # 1F vs 2C
-    ("R32-5",  17, 21),   # 2E vs 2I
-    ("R32-6",   9, 26),   # 1I vs best 3rd #2
-    ("R32-7",   7, 27),   # 1G vs best 3rd #3
-    ("R32-8",   4, 28),   # 1D slot → actually USA(1D) vs best 3rd #4
-    # Re-label to be cleaner; for tournament.json we assign seeds explicitly:
-    # Match 8 should be 1D vs best 3rd, but we already used 1D for match 3.
-    # The real WC structure: match 3 is 1D vs 3rd, match 8 is USA(1D) host slot.
-    # Since USA hosts group D (seed 4), we need to be careful.
-    # Simplification: use explicit seed assignment in tournament.json.
-    ("R32-9",   8, 22),   # 1H vs 2J
-    ("R32-10", 23, 24),   # 2K vs 2L
-    ("R32-11",  2, 29),   # 1B vs best 3rd #5
-    ("R32-12", 16, 19),   # 2D vs 2G
-    ("R32-13", 10, 20),   # 1J vs 2H
-    ("R32-14", 11, 30),   # 1K vs best 3rd #6
-    ("R32-15", 12, 31),   # 1L vs best 3rd #7
-    ("R32-16",  1, 32),   # 1A vs best 3rd #8
+    # ── Left Bracket ──────────────────────────────────────────────────────────
+    ("R32-1",  13, 14),   # Match 73: 2A vs 2B
+    ("R32-2",   6, 15),   # Match 75: 1F vs 2C
+    
+    ("R32-3",   5, 25),   # Match 74: 1E vs best 3rd #1
+    ("R32-4",   9, 26),   # Match 77: 1I vs best 3rd #2
+    
+    ("R32-5",   3, 18),   # Match 76: 1C vs 2F
+    ("R32-6",  17, 21),   # Match 78: 2E vs 2I
+    
+    ("R32-7",   1, 27),   # Match 79: 1A vs best 3rd #3
+    ("R32-8",  12, 28),   # Match 80: 1L vs best 3rd #4
+
+    # ── Right Bracket ─────────────────────────────────────────────────────────
+    ("R32-9",  23, 24),   # Match 83: 2K vs 2L
+    ("R32-10",  8, 22),   # Match 84: 1H vs 2J
+    
+    ("R32-11",  4, 29),   # Match 81: 1D vs best 3rd #5
+    ("R32-12",  7, 30),   # Match 82: 1G vs best 3rd #6
+    
+    ("R32-13", 10, 20),   # Match 86: 1J vs 2H
+    ("R32-14", 16, 19),   # Match 88: 2D vs 2G
+    
+    ("R32-15",  2, 31),   # Match 85: 1B vs best 3rd #7
+    ("R32-16", 11, 32),   # Match 87: 1K vs best 3rd #8
 ]
 
 # R16 pairings: which R32 match winners meet
 _R16_PAIRS = [
-    ("R16-1", 0, 2),   # W(R32-1) vs W(R32-3)
-    ("R16-2", 1, 3),   # W(R32-2) vs W(R32-4)
-    ("R16-3", 4, 6),   # W(R32-5) vs W(R32-7)
-    ("R16-4", 5, 7),   # W(R32-6) vs W(R32-8)
-    ("R16-5", 8, 10),  # W(R32-9) vs W(R32-11)
-    ("R16-6", 9, 11),  # W(R32-10) vs W(R32-12)
-    ("R16-7", 12, 14), # W(R32-13) vs W(R32-15)
-    ("R16-8", 13, 15), # W(R32-14) vs W(R32-16)
+    ("R16-1", 0, 1),
+    ("R16-2", 2, 3),
+    ("R16-3", 4, 5),
+    ("R16-4", 6, 7),
+    ("R16-5", 8, 9),
+    ("R16-6", 10, 11),
+    ("R16-7", 12, 13),
+    ("R16-8", 14, 15),
 ]
 
 _QF_PAIRS = [
