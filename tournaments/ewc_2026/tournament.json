@@ -1,0 +1,165 @@
+{
+  "id": "ewc_2026",
+  "name": "Esports World Cup 2026",
+  "game": "lol",
+  "stages": [
+    {
+      "id": "groups",
+      "name": "Group Stage",
+      "type": "gsl_groups",
+      "groups": [
+        {
+          "id": "group_a",
+          "name": "Group A",
+          "teams": [
+            {
+              "id": "g2",
+              "name": "G2 Esports",
+              "seed": 1
+            },
+            {
+              "id": "al",
+              "name": "Anyone's Legend",
+              "seed": 2
+            },
+            {
+              "id": "dk",
+              "name": "Dplus KIA",
+              "seed": 3
+            },
+            {
+              "id": "furia",
+              "name": "FURIA",
+              "seed": 4
+            }
+          ]
+        },
+        {
+          "id": "group_b",
+          "name": "Group B",
+          "teams": [
+            {
+              "id": "tsw",
+              "name": "Team Secret Whales",
+              "seed": 1
+            },
+            {
+              "id": "geng",
+              "name": "Gen.G",
+              "seed": 2
+            },
+            {
+              "id": "kc",
+              "name": "Karmine Corp",
+              "seed": 3
+            },
+            {
+              "id": "sen",
+              "name": "Sentinels",
+              "seed": 4
+            }
+          ]
+        },
+        {
+          "id": "group_c",
+          "name": "Group C",
+          "teams": [
+            {
+              "id": "blg",
+              "name": "Bilibili Gaming",
+              "seed": 1
+            },
+            {
+              "id": "t1",
+              "name": "T1",
+              "seed": 2
+            },
+            {
+              "id": "gam",
+              "name": "GAM Esports",
+              "seed": 3
+            },
+            {
+              "id": "mkoi",
+              "name": "Movistar KOI",
+              "seed": 4
+            }
+          ]
+        },
+        {
+          "id": "group_d",
+          "name": "Group D",
+          "teams": [
+            {
+              "id": "hle",
+              "name": "Hanwha Life Esports",
+              "seed": 1
+            },
+            {
+              "id": "lyon",
+              "name": "LYON Gaming",
+              "seed": 2
+            },
+            {
+              "id": "jdg",
+              "name": "JD Gaming",
+              "seed": 3
+            },
+            {
+              "id": "los",
+              "name": "LOS Grandes",
+              "seed": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "knockout",
+      "name": "Knockout Stage",
+      "type": "single_elim",
+      "teams": [
+        {
+          "id": "groups_adv1",
+          "name": "Group A Winner",
+          "seed": 1
+        },
+        {
+          "id": "groups_adv4",
+          "name": "Group B Runner-up",
+          "seed": 8
+        },
+        {
+          "id": "groups_adv3",
+          "name": "Group B Winner",
+          "seed": 4
+        },
+        {
+          "id": "groups_adv2",
+          "name": "Group A Runner-up",
+          "seed": 5
+        },
+        {
+          "id": "groups_adv5",
+          "name": "Group C Winner",
+          "seed": 2
+        },
+        {
+          "id": "groups_adv8",
+          "name": "Group D Runner-up",
+          "seed": 7
+        },
+        {
+          "id": "groups_adv7",
+          "name": "Group D Winner",
+          "seed": 3
+        },
+        {
+          "id": "groups_adv6",
+          "name": "Group C Runner-up",
+          "seed": 6
+        }
+      ]
+    }
+  ]
+}

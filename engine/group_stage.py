@@ -165,3 +165,34 @@ def get_all_third_place_teams(groups: List[Group]) -> List[str]:
         if len(order) >= 3:
             result.append(order[2])
     return result
+
+
+def score_gsl_group_picks(group: Group) -> Tuple[float, float]:
+    """
+    Score a single GSL group's picks against the actual result.
+
+    1 point each for correct placement (1st, 2nd, 3rd, 4th) (up to 4 pts)
+    2 points for the correct two advancing (and correct two failing) (up to 2 pts)
+    Total: 6 points max per group.
+
+    Returns:
+        (earned, max_possible) — max_possible is 6.0 if actual is known, else 0.0
+    """
+    if not group.actual_order or not group.predicted_order:
+        return 0.0, 0.0
+
+    actual = group.actual_order
+    predicted = group.predicted_order
+    n = len(actual)
+    if n != 4 or len(predicted) != 4:
+        return 0.0, 0.0
+
+    # Correct placement: 1 pt each
+    earned = sum(1.0 for i in range(4) if predicted[i] == actual[i])
+
+    # Correct two advancing: 2 pts
+    if set(predicted[:2]) == set(actual[:2]):
+        earned += 2.0
+
+    return earned, 6.0
+

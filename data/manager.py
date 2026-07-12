@@ -15,7 +15,7 @@ from engine.swiss import (
 )
 from engine.bracket import compute_bracket_state, BracketState
 from engine.double_elim import compute_double_elim_state, DoubleElimState
-from engine.group_stage import compute_group_state, GroupState, score_group_picks
+from engine.group_stage import compute_group_state, GroupState, score_group_picks, score_gsl_group_picks
 from engine.wc_bracket import compute_wc_bracket_state, WCBracketState
 
 
@@ -213,7 +213,7 @@ class TournamentManager(QObject):
             teams = stage_config.get("teams", [])
             resolved_teams = self._resolve_dynamic_teams(teams)
             state = self._compute_double_elim(stage_id, resolved_teams, stage_config)
-        elif stage_type == "group_stage":
+        elif stage_type in ("group_stage", "gsl_groups"):
             state = self._compute_group_stage(stage_id, stage_config)
         elif stage_type == "wc_bracket":
             teams = stage_config.get("teams", [])
@@ -295,6 +295,17 @@ class TournamentManager(QObject):
                         "name": team_record.name,
                         "logo_url": team_record.logo_url or ""
                     })
+        elif isinstance(state, GroupState):
+            for group in state.groups:
+                order = group.actual_order if group.actual_order else group.predicted_order
+                for team_id in order[:2]:
+                    team_obj = next((t for t in group.teams if t.team_id == team_id), None)
+                    if team_obj:
+                        advancing.append({
+                            "id": team_obj.team_id,
+                            "name": team_obj.name,
+                            "logo_url": team_obj.logo_url or ""
+                        })
         return advancing
 
     def _compute_double_elim(
@@ -498,7 +509,7 @@ class TournamentManager(QObject):
 
         # Load actual orders and third-place rankings from results.json
         actual_orders: Dict[str, List[str]] = {}
-        stage_results = self._results.get("groups", {})
+        stage_results = self._results.get(stage_id, {})
         for gconf in groups_config:
             gid = gconf["id"]
             standings = stage_results.get(gid, {}).get("final_standings", [])
@@ -723,7 +734,7 @@ class TournamentManager(QObject):
         for stage in self.stages:
             stage_id = stage["id"]
             # Group stage uses a different pick structure — skip match-level locking
-            if stage.get("type") in ("group_stage",):
+            if stage.get("type") in ("group_stage", "gsl_groups"):
                 continue
             state = self.compute_stage_state(stage)
             if state is None:
@@ -759,13 +770,21 @@ class TournamentManager(QObject):
                 continue
 
             if isinstance(state, GroupState):
-                # Hybrid group scoring: max 1.0 per group
-                for group in state.groups:
-                    earned, max_pts = score_group_picks(group)
-                    if max_pts > 0:
-                        # Scale to integer-friendly counts (multiply by 8 so 1.0 = 8 pts)
-                        total_sum += 8.0
-                        correct_sum += earned * 8.0
+                stage_type = stage.get("type")
+                if stage_type == "gsl_groups":
+                    for group in state.groups:
+                        earned, max_pts = score_gsl_group_picks(group)
+                        if max_pts > 0:
+                            total_sum += max_pts
+                            correct_sum += earned
+                else:
+                    # Hybrid group scoring: max 1.0 per group
+                    for group in state.groups:
+                        earned, max_pts = score_group_picks(group)
+                        if max_pts > 0:
+                            # Scale to integer-friendly counts (multiply by 8 so 1.0 = 8 pts)
+                            total_sum += 8.0
+                            correct_sum += earned * 8.0
             else:
                 all_matches = [m for rnd in state.rounds for m in rnd]
                 for m in all_matches:

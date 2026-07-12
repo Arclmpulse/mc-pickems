@@ -106,18 +106,19 @@ _R32_PAIRS = [
     ("R32-3",   5, 25),   # Match 74: 1E vs best 3rd #1
     ("R32-4",   9, 26),   # Match 77: 1I vs best 3rd #2
     
-    ("R32-5",   3, 18),   # Match 76: 1C vs 2F
-    ("R32-6",  17, 21),   # Match 78: 2E vs 2I
+    ("R32-5",  23, 24),   # Match 83: 2K vs 2L
+    ("R32-6",   8, 22),   # Match 84: 1H vs 2J
     
-    ("R32-7",   1, 27),   # Match 79: 1A vs best 3rd #3
-    ("R32-8",  12, 28),   # Match 80: 1L vs best 3rd #4
+    ("R32-7",   4, 29),   # Match 81: 1D vs best 3rd #5
+    ("R32-8",   7, 30),   # Match 82: 1G vs best 3rd #6
 
     # ── Right Bracket ─────────────────────────────────────────────────────────
-    ("R32-9",  23, 24),   # Match 83: 2K vs 2L
-    ("R32-10",  8, 22),   # Match 84: 1H vs 2J
+    ("R32-9",   3, 18),   # Match 76: 1C vs 2F
+    ("R32-10", 17, 21),   # Match 78: 2E vs 2I
     
-    ("R32-11",  4, 29),   # Match 81: 1D vs best 3rd #5
-    ("R32-12",  7, 30),   # Match 82: 1G vs best 3rd #6
+    ("R32-11",  1, 27),   # Match 79: 1A vs best 3rd #3
+    ("R32-12", 12, 28),   # Match 80: 1L vs best 3rd #4
+
     
     ("R32-13", 10, 20),   # Match 86: 1J vs 2H
     ("R32-14", 16, 19),   # Match 88: 2D vs 2G

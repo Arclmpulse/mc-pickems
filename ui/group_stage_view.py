@@ -426,7 +426,8 @@ class GroupStageView(QScrollArea):
                     team.logo_path or find_local_logo(self.cache_dir, team.team_id)
                 )
 
-        cols = 4
+        num_groups = len(state.groups)
+        cols = 2 if num_groups == 4 else 4
         for idx, group in enumerate(state.groups):
             row = idx // cols
             col = idx % cols

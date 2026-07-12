@@ -294,7 +294,7 @@ class MainWindow(QMainWindow):
             elif stage["type"] == "double_elim":
                 view = DoubleElimView(self.manager, stage, self._cache_dir)
                 view.state_changed.connect(self._update_accuracy)
-            elif stage["type"] == "group_stage":
+            elif stage["type"] in ("group_stage", "gsl_groups"):
                 view = GroupStageView(self.manager, stage, self._cache_dir)
                 view.state_changed.connect(self._update_accuracy)
             elif stage["type"] == "wc_bracket":
