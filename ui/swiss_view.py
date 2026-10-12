@@ -239,6 +239,15 @@ class SwissView(QScrollArea):
 
     def _build_round_columns(self, state: SwissState, logo_cache: Dict[str, Optional[str]]) -> None:
         num_generated = state.num_rounds
+        tournament_game = self.manager.game if hasattr(self.manager, "game") else "cs"
+        if "manual_pairings" in self.stage_config:
+            is_manual = bool(self.stage_config["manual_pairings"])
+        elif "manual_draws" in self.stage_config or "manual_rounds" in self.stage_config:
+            is_manual = bool(
+                self.stage_config.get("manual_draws") or self.stage_config.get("manual_rounds")
+            )
+        else:
+            is_manual = (tournament_game == "lol")
 
         for rnd_idx in range(5):   # always show 5 round columns
             round_num = rnd_idx + 1
@@ -249,12 +258,24 @@ class SwissView(QScrollArea):
                 self._populate_round_column(col, matches, state, logo_cache, round_num)
             else:
                 needed = round_num - 1
-                msg = (
-                    f"Complete Round {needed} picks\nto see matchups"
-                    if needed > 0
-                    else "Make picks to continue"
-                )
-                col.set_subtitle("pending")
+                prev_completed = False
+                if needed > 0 and (needed - 1) < num_generated:
+                    prev_matches = state.rounds[needed - 1]
+                    prev_completed = all(m.winner_id is not None for m in prev_matches)
+
+                if is_manual and prev_completed:
+                    msg = (
+                        f"Awaiting Round {round_num} draw\n\n"
+                        f"Enter drawn matchups in\nresults.json"
+                    )
+                    col.set_subtitle("awaiting draw")
+                else:
+                    msg = (
+                        f"Complete Round {needed} picks\nto see matchups"
+                        if needed > 0
+                        else "Make picks to continue"
+                    )
+                    col.set_subtitle("pending")
                 col.add_placeholder(msg)
 
             col.add_stretch()

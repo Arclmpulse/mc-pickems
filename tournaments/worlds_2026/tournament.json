@@ -1,0 +1,170 @@
+{
+  "id": "worlds_2026",
+  "name": "Worlds 2026",
+  "game": "lol",
+  "stages": [
+    {
+      "id": "playin",
+      "name": "Play-in",
+      "type": "double_elim",
+      "match_type": "bo3",
+      "teams": [
+        {
+          "id": "c9",
+          "name": "Cloud9",
+          "seed": 1
+        },
+        {
+          "id": "mvk",
+          "name": "MVK Esports",
+          "seed": 2
+        },
+        {
+          "id": "furia",
+          "name": "FURIA",
+          "seed": 3
+        },
+        {
+          "id": "kc",
+          "name": "Karmine Corp",
+          "seed": 4
+        }
+      ]
+    },
+    {
+      "id": "swiss",
+      "name": "Swiss Stage",
+      "type": "swiss",
+      "manual_pairings": true,
+      "teams": [
+        {
+          "id": "geng",
+          "name": "Gen.G",
+          "seed": 1
+        },
+        {
+          "id": "al",
+          "name": "Anyone's Legend",
+          "seed": 2
+        },
+        {
+          "id": "hle",
+          "name": "Hanwha Life Esports",
+          "seed": 3
+        },
+        {
+          "id": "t1",
+          "name": "T1",
+          "seed": 4
+        },
+        {
+          "id": "blg",
+          "name": "Bilibili Gaming",
+          "seed": 5
+        },
+        {
+          "id": "g2",
+          "name": "G2 Esports",
+          "seed": 6
+        },
+        {
+          "id": "liquid",
+          "name": "Team Liquid",
+          "seed": 7
+        },
+        {
+          "id": "tes",
+          "name": "Top Esports",
+          "seed": 8
+        },
+        {
+          "id": "dk",
+          "name": "Dplus KIA",
+          "seed": 9
+        },
+        {
+          "id": "ig",
+          "name": "Invictus Gaming",
+          "seed": 10
+        },
+        {
+          "id": "lyon",
+          "name": "LYON Gaming",
+          "seed": 11
+        },
+        {
+          "id": "mkoi",
+          "name": "Movistar KOI",
+          "seed": 12
+        },
+        {
+          "id": "los",
+          "name": "LOS Grandes",
+          "seed": 13
+        },
+        {
+          "id": "tsw",
+          "name": "Team Secret Whales",
+          "seed": 14
+        },
+        {
+          "id": "cfo",
+          "name": "CTBC Flying Oyster",
+          "seed": 15
+        },
+        {
+          "id": "playin_winner",
+          "name": "Play-in Winner",
+          "seed": 16
+        }
+      ]
+    },
+    {
+      "id": "knockout",
+      "name": "Knockout Stage",
+      "type": "single_elim",
+      "teams": [
+        {
+          "id": "swiss_adv1",
+          "name": "Swiss Qualifier #1",
+          "seed": 1
+        },
+        {
+          "id": "swiss_adv2",
+          "name": "Swiss Qualifier #2",
+          "seed": 2
+        },
+        {
+          "id": "swiss_adv3",
+          "name": "Swiss Qualifier #3",
+          "seed": 3
+        },
+        {
+          "id": "swiss_adv4",
+          "name": "Swiss Qualifier #4",
+          "seed": 4
+        },
+        {
+          "id": "swiss_adv5",
+          "name": "Swiss Qualifier #5",
+          "seed": 5
+        },
+        {
+          "id": "swiss_adv6",
+          "name": "Swiss Qualifier #6",
+          "seed": 6
+        },
+        {
+          "id": "swiss_adv7",
+          "name": "Swiss Qualifier #7",
+          "seed": 7
+        },
+        {
+          "id": "swiss_adv8",
+          "name": "Swiss Qualifier #8",
+          "seed": 8
+        }
+      ]
+    }
+  ]
+}

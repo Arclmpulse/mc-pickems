@@ -204,7 +204,7 @@ class TournamentManager(QObject):
         if stage_type == "swiss":
             teams = stage_config.get("teams", [])
             resolved_teams = self._resolve_dynamic_teams(teams)
-            state = self._compute_swiss(stage_id, resolved_teams)
+            state = self._compute_swiss(stage_id, resolved_teams, stage_config)
         elif stage_type == "single_elim":
             teams = stage_config.get("teams", [])
             resolved_teams = self._resolve_dynamic_teams(teams)
@@ -411,12 +411,98 @@ class TournamentManager(QObject):
 
         return winners
 
-    def _compute_swiss(self, stage_id: str, teams: List[dict]) -> SwissState:
+    def _parse_round_num(self, key: Union[str, int]) -> Optional[int]:
+        if isinstance(key, int):
+            return key
+        k = str(key).lower().strip()
+        if k.startswith("round_"):
+            num_part = k[6:]
+            if num_part.isdigit():
+                return int(num_part)
+        elif k.startswith("round"):
+            num_part = k[5:]
+            if num_part.isdigit():
+                return int(num_part)
+        elif k.isdigit():
+            return int(k)
+        return None
+
+    def _normalize_pair_list(self, raw_list: list) -> List[dict]:
+        pairs = []
+        for item in raw_list:
+            if isinstance(item, dict):
+                t1 = item.get("team1")
+                t2 = item.get("team2")
+                if not t1 or not t2:
+                    if "teams" in item and isinstance(item["teams"], (list, tuple)) and len(item["teams"]) >= 2:
+                        t1, t2 = item["teams"][0], item["teams"][1]
+                    elif "winner" in item and "loser" in item:
+                        t1, t2 = item["winner"], item["loser"]
+                if t1 and t2 and t1 != t2:
+                    pairs.append({
+                        "team1": str(t1),
+                        "team2": str(t2),
+                        "match_type": item.get("match_type"),
+                    })
+            elif isinstance(item, (list, tuple)) and len(item) >= 2:
+                pairs.append({
+                    "team1": str(item[0]),
+                    "team2": str(item[1]),
+                })
+        return pairs
+
+    def _extract_manual_swiss_rounds(
+        self, stage_id: str, stage_config: dict
+    ) -> Dict[int, List[dict]]:
+        manual_rounds: Dict[int, List[dict]] = {}
+
+        # 1. Check tournament.json stage_config
+        cfg_rounds = (
+            stage_config.get("manual_rounds")
+            or stage_config.get("rounds")
+            or stage_config.get("draws")
+            or stage_config.get("pairings")
+            or {}
+        )
+        if isinstance(cfg_rounds, dict):
+            for k, val in cfg_rounds.items():
+                rnd_num = self._parse_round_num(k)
+                if rnd_num and isinstance(val, list):
+                    manual_rounds[rnd_num] = self._normalize_pair_list(val)
+
+        # 2. Check results.json (under stage_id)
+        stage_results = self._results.get(stage_id, {})
+        if isinstance(stage_results, dict):
+            for k, val in stage_results.items():
+                rnd_num = self._parse_round_num(k)
+                if rnd_num and isinstance(val, list):
+                    parsed_pairs = self._normalize_pair_list(val)
+                    if parsed_pairs:
+                        manual_rounds[rnd_num] = parsed_pairs
+
+        return manual_rounds
+
+    def _compute_swiss(
+        self, stage_id: str, teams: List[dict], stage_config: Optional[dict] = None
+    ) -> SwissState:
         """
         Iteratively compute Swiss state.
         Each iteration discovers one more round of winners.
         Converges when no new winners are found.
         """
+        # Default: LoL Swiss uses manual draw ceremonies; CS Swiss uses Buchholz.
+        # Can be explicitly overridden in stage_config via manual_pairings: true/false.
+        manual_pairings = (self.game == "lol")
+        manual_rounds = {}
+        if stage_config:
+            if "manual_pairings" in stage_config:
+                manual_pairings = bool(stage_config["manual_pairings"])
+            elif "manual_draws" in stage_config or "manual_rounds" in stage_config:
+                manual_pairings = bool(
+                    stage_config.get("manual_draws") or stage_config.get("manual_rounds")
+                )
+            manual_rounds = self._extract_manual_swiss_rounds(stage_id, stage_config)
+
         collected: Dict[str, str] = {}
         matched_indices: Dict[str, tuple] = {}
 
@@ -426,7 +512,11 @@ class TournamentManager(QObject):
                 del self._actual_results[mid]
 
         for _ in range(6):  # max 5 rounds + convergence check
-            state = compute_swiss_state(stage_id, teams, collected)
+            state = compute_swiss_state(
+                stage_id, teams, collected,
+                manual_pairings=manual_pairings,
+                manual_rounds=manual_rounds,
+            )
             prev_size = len(collected)
 
             for rnd_matches in state.rounds:
@@ -438,7 +528,11 @@ class TournamentManager(QObject):
             if len(collected) == prev_size:
                 break
 
-        return compute_swiss_state(stage_id, teams, collected)
+        return compute_swiss_state(
+            stage_id, teams, collected,
+            manual_pairings=manual_pairings,
+            manual_rounds=manual_rounds,
+        )
 
     def _compute_bracket(self, stage_id: str, teams: List[dict]) -> BracketState:
         """Iteratively compute bracket state."""

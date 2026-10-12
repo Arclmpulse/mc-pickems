@@ -151,6 +151,8 @@ def compute_swiss_state(
     stage_id: str,
     initial_teams: List[dict],
     effective_winners: Dict[str, str],
+    manual_pairings: bool = False,
+    manual_rounds: Optional[Dict[int, List[dict]]] = None,
 ) -> SwissState:
     """
     Compute the complete Swiss bracket state from scratch.
@@ -160,8 +162,11 @@ def compute_swiss_state(
         initial_teams:     list of {id, name, seed, logo_url?}
         effective_winners: match_id → winner_team_id
                            (caller merges results + picks; results take priority)
+        manual_pairings:   if True, disables Buchholz autofill for subsequent rounds
+                           when manual matchups are not provided.
+        manual_rounds:     dict mapping round_num (1..5) to list of {"team1": id, "team2": id, ...}
 
-    Stops generating rounds when a round has at least one unresolved match.
+    Stops generating rounds when a round has at least one unresolved match or lacks manual matchups.
     """
     teams: Dict[str, TeamRecord] = {
         t["id"]: TeamRecord(
@@ -182,7 +187,27 @@ def compute_swiss_state(
 
         matches: List[MatchInfo] = []
 
-        if rnd == 1:
+        has_manual = bool(manual_rounds and rnd in manual_rounds and manual_rounds[rnd])
+
+        if has_manual:
+            for p in manual_rounds[rnd]:
+                a, b = p.get("team1"), p.get("team2")
+                if not a or not b or a not in teams or b not in teams:
+                    continue
+                mt = p.get("match_type") or _match_type(teams[a], teams[b])
+                t1, t2 = (a, b) if teams[a].initial_seed <= teams[b].initial_seed else (b, a)
+                if teams[t1].wins == teams[t2].wins and teams[t1].losses == teams[t2].losses:
+                    wl = f"{teams[t1].wins}-{teams[t1].losses}"
+                else:
+                    wl = f"{teams[t1].wins}-{teams[t1].losses}"
+                matches.append(MatchInfo(
+                    match_id=_make_match_id(stage_id, rnd, t1, t2),
+                    round_num=rnd, team1_id=t1, team2_id=t2,
+                    match_type=mt, wl_group=wl,
+                ))
+            if not matches:
+                break
+        elif rnd == 1:
             # Fixed initial matchups: top half vs bottom half
             sorted_all = _sort_group(active, teams)
             half = len(sorted_all) // 2
@@ -193,6 +218,9 @@ def compute_swiss_state(
                     round_num=1, team1_id=a, team2_id=b,
                     match_type="bo1", wl_group="0-0",
                 ))
+        elif manual_pairings:
+            # Subsequent round has no manual draw provided yet: stop generating rounds
+            break
         else:
             # Group active teams by W-L record
             groups: Dict[str, List[str]] = {}
